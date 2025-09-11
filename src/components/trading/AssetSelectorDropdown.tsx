@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { ChevronDown, Search, Star, TrendingUp, ArrowUp, ArrowDown, Activity } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -17,6 +17,7 @@ export function AssetSelectorDropdown({ className }: AssetSelectorDropdownProps)
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTab, setSelectedTab] = useState<'favorites' | 'all' | 'recent'>('all');
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   
@@ -66,6 +67,19 @@ export function AssetSelectorDropdown({ className }: AssetSelectorDropdownProps)
     }
   };
 
+  // Update dropdown position when opened
+  const updateDropdownPosition = useCallback(() => {
+    if (dropdownRef.current && isOpen) {
+      const rect = dropdownRef.current.getBoundingClientRect();
+      const maxWidth = window.innerWidth > 480 ? 450 : window.innerWidth - 32;
+      
+      setDropdownPosition({
+        top: rect.bottom + 12,
+        left: Math.max(16, Math.min(rect.left, window.innerWidth - maxWidth - 16))
+      });
+    }
+  }, [isOpen]);
+
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -74,16 +88,28 @@ export function AssetSelectorDropdown({ className }: AssetSelectorDropdownProps)
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    const handleResize = () => {
+      updateDropdownPosition();
+    };
 
-  // Focus search input when dropdown opens
+    document.addEventListener('mousedown', handleClickOutside);
+    window.addEventListener('resize', handleResize);
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [updateDropdownPosition]);
+
+  // Focus search input and update position when dropdown opens
   useEffect(() => {
-    if (isOpen && inputRef.current) {
-      setTimeout(() => inputRef.current?.focus(), 100);
+    if (isOpen) {
+      updateDropdownPosition();
+      if (inputRef.current) {
+        setTimeout(() => inputRef.current?.focus(), 100);
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, updateDropdownPosition]);
 
   const handleSelectAsset = (symbol: string) => {
     setSelectedSymbol(symbol);
@@ -170,12 +196,29 @@ export function AssetSelectorDropdown({ className }: AssetSelectorDropdownProps)
       {/* Enhanced Dropdown */}
       <AnimatePresence>
         {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.95 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-            className="absolute top-full left-0 mt-3 w-[450px] bg-gray-900/95 backdrop-blur-xl border border-gray-700/50 rounded-2xl shadow-2xl z-50 overflow-hidden"
+          <>
+            {/* Backdrop for mobile */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/20 backdrop-blur-sm lg:hidden"
+              style={{ zIndex: 9998 }}
+              onClick={() => setIsOpen(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, y: -10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.95 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+            className="fixed bg-gray-900/95 backdrop-blur-xl border border-gray-700/50 rounded-2xl shadow-2xl overflow-hidden"
+            style={{
+              zIndex: 9999,
+              top: `${dropdownPosition.top}px`,
+              left: `${dropdownPosition.left}px`,
+              width: window.innerWidth > 480 ? '450px' : `${window.innerWidth - 32}px`,
+              maxWidth: '90vw'
+            }}
           >
             {/* Header with Search and Tabs */}
             <div className="p-4 border-b border-gray-700/50 bg-gradient-to-r from-gray-800/50 to-gray-900/50">
@@ -344,7 +387,8 @@ export function AssetSelectorDropdown({ className }: AssetSelectorDropdownProps)
                 </div>
               </div>
             </div>
-          </motion.div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </div>

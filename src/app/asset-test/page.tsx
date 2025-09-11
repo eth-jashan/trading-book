@@ -8,7 +8,6 @@ import { Badge } from '@/components/ui/badge';
 import { Loader2, Database, Search, Star } from 'lucide-react';
 
 export default function AssetTestPage() {
-  const [isLoading, setIsLoading] = useState(false);
   const [selectedSymbol, setSelectedSymbol] = useState<string>('');
   const [initializationStatus, setInitializationStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   

@@ -206,6 +206,7 @@ export const AssetList: React.FC<AssetListProps> = ({
       
       {/* Virtualized List */}
       <List
+      //@ts-ignore
         height={calculatedHeight}
         itemCount={assetsWithMarketData.length}
         itemSize={calculatedItemHeight}

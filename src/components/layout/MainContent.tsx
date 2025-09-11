@@ -41,8 +41,8 @@ export function MainContent({ children }: MainContentProps) {
         {selectedSymbol ? (
           <div className='flex w-full flex-row h-screen relative'>
             {/* Left Panel - Chart Area (fills remaining space) */}
-            <div className="flex-1 p-4 lg:pr-0 overflow-scroll">
-              <div className="mb-4 lg:pr-4">
+            <div className="flex-1 p-4 lg:pr-0 overflow-scroll" style={{ overflowY: 'auto', overflowX: 'visible' }}>
+              <div className="mb-4 lg:pr-4 relative" style={{ overflow: 'visible' }}>
                 <AssetSelectorDropdown />
               </div>
               <TradingChart
