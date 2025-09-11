@@ -80,61 +80,8 @@ interface MarketState {
   reset: () => void;
 }
 
-// Add some initial mock data for testing
-const mockPrices = new Map<string, PriceData>();
-mockPrices.set('BTC', {
-  symbol: 'BTC',
-  price: 43250.50,
-  change24h: 1250.75,
-  changePercent24h: 2.98,
-  volume24h: 28500000,
-  high24h: 44100.00,
-  low24h: 41800.25,
-  timestamp: Date.now(),
-  bid: 43248.25,
-  ask: 43252.75,
-  spread: 4.50,
-  marketType: 'perpetual',
-  displayName: 'BTC',
-  baseAsset: 'BTC',
-  quoteAsset: 'USD'
-});
-
-mockPrices.set('ETH', {
-  symbol: 'ETH',
-  price: 2648.75,
-  change24h: -85.25,
-  changePercent24h: -3.12,
-  volume24h: 15200000,
-  high24h: 2750.80,
-  low24h: 2620.15,
-  timestamp: Date.now(),
-  bid: 2647.50,
-  ask: 2649.00,
-  spread: 1.50,
-  marketType: 'perpetual',
-  displayName: 'ETH',
-  baseAsset: 'ETH',
-  quoteAsset: 'USD'
-});
-
-mockPrices.set('SOL', {
-  symbol: 'SOL',
-  price: 98.45,
-  change24h: 4.25,
-  changePercent24h: 4.51,
-  volume24h: 8500000,
-  high24h: 102.30,
-  low24h: 93.80,
-  timestamp: Date.now(),
-  bid: 98.35,
-  ask: 98.55,
-  spread: 0.20,
-  marketType: 'perpetual',
-  displayName: 'SOL',
-  baseAsset: 'SOL',
-  quoteAsset: 'USD'
-});
+// Initialize with empty map - prices will be populated from WebSocket/API only
+const initialPrices = new Map<string, PriceData>();
 
 const initialMarketStats: MarketStatistics = {
   totalMarketCap: 0,
@@ -154,8 +101,8 @@ const initialLoadingState: AsyncState = {
 };
 
 const initialState = {
-  // Data
-  prices: mockPrices,
+  // Data - all prices from live WebSocket/API only
+  prices: initialPrices,
   orderBooks: new Map<string, OrderBook>(),
   candles: new Map<string, Map<string, Candle[]>>(),
   priceHistory: new Map<string, Array<{ price: number; timestamp: number }>>(),

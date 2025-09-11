@@ -325,8 +325,13 @@ export function calculatePnL(
   entryPrice: number,
   currentPrice: number,
   size: number,
-  side: 'long' | 'short'
-): { pnl: number; pnlPercentage: number } {
+  side: 'long' | 'short',
+  leverage: number = 1
+): { 
+  pnl: number; 
+  pnlPercentage: number; // ROI based on margin
+  priceChangePercent: number; // Price movement percentage
+} {
   let pnl: number;
   
   if (side === 'long') {
@@ -335,24 +340,40 @@ export function calculatePnL(
     pnl = (entryPrice - currentPrice) * size;
   }
   
-  const pnlPercentage = entryPrice > 0 ? (pnl / (entryPrice * size)) * 100 : 0;
+  // Calculate margin used (position value / leverage)
+  const marginUsed = (entryPrice * size) / leverage;
   
-  return { pnl, pnlPercentage };
+  // P&L percentage is ROI on margin (what traders actually care about)
+  const pnlPercentage = marginUsed > 0 ? (pnl / marginUsed) * 100 : 0;
+  
+  // Price change percentage (for reference)
+  const priceChangePercent = entryPrice > 0 ? ((currentPrice - entryPrice) / entryPrice) * 100 : 0;
+  
+  return { pnl, pnlPercentage, priceChangePercent };
 }
 
 /**
  * Calculate liquidation price for a position
+ * Uses proper formula considering initial margin and maintenance margin
  */
 export function calculateLiquidationPrice(
   entryPrice: number,
   leverage: number,
   side: 'long' | 'short',
-  maintenanceMargin: number = 0.05 // 5% default maintenance margin
+  maintenanceMarginRate: number = 0.005 // 0.5% maintenance margin rate (standard for crypto)
 ): number {
+  // Initial margin rate = 1 / leverage
+  const initialMarginRate = 1 / leverage;
+  
+  // Liquidation occurs when losses equal (initial margin - maintenance margin)
+  // This gives us more accurate liquidation prices
+  
   if (side === 'long') {
-    return entryPrice * (1 - (1 / leverage) + maintenanceMargin);
+    // Long position liquidates when price drops by (initial margin - maintenance margin)
+    return entryPrice * (1 - initialMarginRate + maintenanceMarginRate);
   } else {
-    return entryPrice * (1 + (1 / leverage) - maintenanceMargin);
+    // Short position liquidates when price rises by (initial margin - maintenance margin)
+    return entryPrice * (1 + initialMarginRate - maintenanceMarginRate);
   }
 }
 
@@ -365,6 +386,36 @@ export function calculateRequiredMargin(
   leverage: number = 1
 ): number {
   return (size * price) / leverage;
+}
+
+/**
+ * Calculate ROI (Return on Investment) based on margin
+ */
+export function calculateROI(
+  pnl: number,
+  margin: number
+): number {
+  return margin > 0 ? (pnl / margin) * 100 : 0;
+}
+
+/**
+ * Calculate position value
+ */
+export function calculatePositionValue(
+  size: number,
+  currentPrice: number
+): number {
+  return size * currentPrice;
+}
+
+/**
+ * Check if price data is stale
+ */
+export function isPriceStale(
+  timestamp: number,
+  maxAge: number = 5000 // 5 seconds
+): boolean {
+  return Date.now() - timestamp > maxAge;
 }
 
 /**

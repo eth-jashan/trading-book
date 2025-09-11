@@ -128,23 +128,16 @@ interface PositionCardProps {
 function PositionCard({ position, onClose, isMobile, isExpanded, onToggleExpand }: PositionCardProps) {
   const marketStore = useMarketStore();
   
-  // Get current market price for real-time P&L
+  // Use P&L values from position (already calculated with correct formula)
+  const realTimePnl = position.pnl;
+  const realTimePnlPercentage = position.pnlPercentage; // This is now ROI on margin
+  const priceChangePercent = position.priceChangePercent || 0; // Price movement %
+  
+  // Get current market price for display
   const currentMarketPrice = useMemo(() => {
     const priceData = marketStore.getPrice(position.symbol);
     return priceData?.price || position.currentPrice;
   }, [marketStore, position.symbol, position.currentPrice]);
-  
-  // Calculate real-time P&L
-  const realTimePnl = useMemo(() => {
-    const priceDiff = currentMarketPrice - position.entryPrice;
-    const multiplier = position.side === 'long' ? 1 : -1;
-    return priceDiff * position.size * multiplier;
-  }, [currentMarketPrice, position.entryPrice, position.size, position.side]);
-  
-  const realTimePnlPercentage = useMemo(() => {
-    if (position.entryPrice === 0) return 0;
-    return (realTimePnl / (position.entryPrice * position.size)) * 100;
-  }, [realTimePnl, position.entryPrice, position.size]);
   
   const isProfit = realTimePnl >= 0;
   const isLong = position.side === 'long';

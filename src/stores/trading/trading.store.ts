@@ -203,19 +203,34 @@ export const useTradingStore = create<TradingState>()(
                   order.status = 'rejected';
                   order.reason = 'Insufficient balance';
                 } else {
-                  // Create new position (simplified for debugging)
+                  // Create new position with enhanced price tracking
                   const position: Position = {
                     id: generateId('pos'),
                     symbol: order.symbol,
                     side: order.side === 'buy' ? 'long' : 'short',
                     size: order.size,
+                    // Price tracking
                     entryPrice: executionPrice,
+                    executionPrice: executionPrice, // Track actual fill price
                     currentPrice: executionPrice,
+                    markPrice: executionPrice,
+                    highestPrice: executionPrice,
+                    lowestPrice: executionPrice,
+                    priceHistory: [{
+                      price: executionPrice,
+                      timestamp: Date.now(),
+                      source: 'api'
+                    }],
+                    // Margin and leverage
                     margin: requiredMargin,
                     leverage: TRADING_CONFIG.DEFAULT_LEVERAGE,
+                    // P&L tracking
                     pnl: 0,
                     pnlPercentage: 0,
+                    priceChangePercent: 0,
+                    // Status
                     timestamp: Date.now(),
+                    lastUpdated: Date.now(),
                     status: 'open',
                     liquidationPrice: calculateLiquidationPrice(
                       executionPrice,
@@ -317,19 +332,34 @@ export const useTradingStore = create<TradingState>()(
               existingPosition.pnlPercentage = pnl.pnlPercentage;
             }
           } else {
-            // Create new position
+            // Create new position with enhanced price tracking
             const position: Position = {
               id: generateId('pos'),
               symbol: order.symbol,
               side: order.side === 'buy' ? 'long' : 'short',
               size: order.size,
+              // Price tracking
               entryPrice: executionPrice,
+              executionPrice: executionPrice,
               currentPrice: executionPrice,
+              markPrice: executionPrice,
+              highestPrice: executionPrice,
+              lowestPrice: executionPrice,
+              priceHistory: [{
+                price: executionPrice,
+                timestamp: Date.now(),
+                source: 'api'
+              }],
+              // Margin and leverage
               margin: requiredMargin,
               leverage: TRADING_CONFIG.DEFAULT_LEVERAGE,
+              // P&L tracking
               pnl: 0,
               pnlPercentage: 0,
+              priceChangePercent: 0,
+              // Status
               timestamp: Date.now(),
+              lastUpdated: Date.now(),
               status: 'open',
               liquidationPrice: calculateLiquidationPrice(
                 executionPrice,
@@ -471,7 +501,15 @@ export const useTradingStore = create<TradingState>()(
           state.balance.available += position.margin + pnl.pnl;
           state.balance.margin -= position.margin;
           state.balance.realizedPnl += pnl.pnl;
-          state.balance.freeMargin = state.balance.available - state.balance.margin;
+          
+          // Update total balance to reflect realized gains/losses
+          state.balance.total = TRADING_CONFIG.DEFAULT_BALANCE + state.balance.realizedPnl;
+          
+          // Recalculate free margin and margin level
+          state.balance.freeMargin = state.balance.available + state.balance.unrealizedPnl;
+          state.balance.marginLevel = state.balance.margin > 0
+            ? ((state.balance.total + state.balance.unrealizedPnl) / state.balance.margin) * 100
+            : 0;
           
           // Add transaction
           state.transactions.push({
@@ -521,10 +559,16 @@ export const useTradingStore = create<TradingState>()(
         set((state) => {
           Object.assign(state.balance, updates);
           
+          // Ensure total reflects realized P&L
+          if (updates.realizedPnl !== undefined) {
+            state.balance.total = TRADING_CONFIG.DEFAULT_BALANCE + state.balance.realizedPnl;
+          }
+          
           // Recalculate dependent values
-          state.balance.freeMargin = state.balance.available - state.balance.margin;
+          const equity = state.balance.total + state.balance.unrealizedPnl;
+          state.balance.freeMargin = state.balance.available + state.balance.unrealizedPnl;
           state.balance.marginLevel = state.balance.margin > 0 
-            ? ((state.balance.total + state.balance.unrealizedPnl) / state.balance.margin) * 100
+            ? (equity / state.balance.margin) * 100
             : 0;
           
           storeEvents.emit(STORE_EVENTS.BALANCE_UPDATED, state.balance);
@@ -703,32 +747,82 @@ export const useTradingStore = create<TradingState>()(
         set((state) => {
           const marketStore = useMarketStore.getState();
           let totalUnrealized = 0;
+          const now = Date.now();
           
           state.positions.forEach(position => {
             if (position.status === 'open') {
               const priceData = marketStore.getPrice(position.symbol);
-              if (priceData) {
+              if (priceData && priceData.price) {
+                // Update current price and track high/low
+                const previousPrice = position.currentPrice;
                 position.currentPrice = priceData.price;
+                position.markPrice = priceData.price;
+                position.lastUpdated = now;
                 
-                const pnl = calculatePnL(
+                // Track highest and lowest prices
+                position.highestPrice = Math.max(position.highestPrice || priceData.price, priceData.price);
+                position.lowestPrice = Math.min(position.lowestPrice || priceData.price, priceData.price);
+                
+                // Add to price history (limit to last 100 points)
+                if (!position.priceHistory) position.priceHistory = [];
+                position.priceHistory.push({
+                  price: priceData.price,
+                  timestamp: now,
+                  source: 'websocket'
+                });
+                if (position.priceHistory.length > 100) {
+                  position.priceHistory.shift();
+                }
+                
+                // Calculate P&L with leverage consideration
+                const pnlResult = calculatePnL(
                   position.entryPrice,
                   priceData.price,
                   position.size,
-                  position.side
+                  position.side,
+                  position.leverage
                 );
                 
-                position.pnl = pnl.pnl;
-                position.pnlPercentage = pnl.pnlPercentage;
-                totalUnrealized += pnl.pnl;
+                position.pnl = pnlResult.pnl;
+                position.pnlPercentage = pnlResult.pnlPercentage; // ROI on margin
+                position.priceChangePercent = pnlResult.priceChangePercent;
+                totalUnrealized += pnlResult.pnl;
+                
+                // Check stop loss and take profit
+                const shouldTriggerSL = position.stopLoss && 
+                  ((position.side === 'long' && priceData.price <= position.stopLoss) ||
+                   (position.side === 'short' && priceData.price >= position.stopLoss));
+                
+                const shouldTriggerTP = position.takeProfit &&
+                  ((position.side === 'long' && priceData.price >= position.takeProfit) ||
+                   (position.side === 'short' && priceData.price <= position.takeProfit));
+                
+                if (shouldTriggerSL || shouldTriggerTP) {
+                  // Auto-close position at stop/take profit
+                  get()._closePosition(position, priceData.price);
+                }
+              } else {
+                console.warn(`No price data available for ${position.symbol}`);
               }
             }
           });
           
+          // Update balance with correct calculations
           state.balance.unrealizedPnl = totalUnrealized;
-          state.balance.freeMargin = state.balance.available - state.balance.margin;
+          
+          // Calculate equity (total capital including unrealized P&L)
+          const equity = state.balance.total + totalUnrealized;
+          
+          // Free margin is available balance plus unrealized P&L
+          state.balance.freeMargin = state.balance.available + totalUnrealized;
+          
+          // Margin level is equity divided by used margin
           state.balance.marginLevel = state.balance.margin > 0 
-            ? ((state.balance.total + state.balance.unrealizedPnl) / state.balance.margin) * 100
+            ? (equity / state.balance.margin) * 100
             : 0;
+            
+          // Emit balance update event
+          storeEvents.emit(STORE_EVENTS.BALANCE_UPDATED, state.balance);
         });
       },
       
@@ -863,19 +957,34 @@ export const useTradingStore = create<TradingState>()(
               existingPosition.side
             );
           } else if (!order.reduceOnly) {
-            // Create new position
+            // Create new position with enhanced price tracking
             const position: Position = {
               id: generateId('pos'),
               symbol: order.symbol,
               side: order.side === 'buy' ? 'long' : 'short',
               size: order.size,
+              // Price tracking
               entryPrice: executionPrice,
+              executionPrice: executionPrice,
               currentPrice: executionPrice,
+              markPrice: executionPrice,
+              highestPrice: executionPrice,
+              lowestPrice: executionPrice,
+              priceHistory: [{
+                price: executionPrice,
+                timestamp: Date.now(),
+                source: 'api'
+              }],
+              // Margin and leverage
               margin: requiredMargin,
               leverage: TRADING_CONFIG.DEFAULT_LEVERAGE,
+              // P&L tracking
               pnl: 0,
               pnlPercentage: 0,
+              priceChangePercent: 0,
+              // Status
               timestamp: Date.now(),
+              lastUpdated: Date.now(),
               status: 'open',
               liquidationPrice: calculateLiquidationPrice(
                 executionPrice,
@@ -1091,16 +1200,36 @@ export const useTradingStore = create<TradingState>()(
   
 
 // Subscribe to price updates to refresh P&L and check pending orders
-storeEvents.subscribe(STORE_EVENTS.PRICE_UPDATE, () => {
+storeEvents.subscribe(STORE_EVENTS.PRICE_UPDATE, (data: { symbol: string; price: number }) => {
   const store = useTradingStore.getState();
+  const openPositions = store.getOpenPositions();
   
-  // Refresh P&L for open positions
-  if (store.getOpenPositions().length > 0) {
+  // Check if we have any open positions for this symbol
+  const hasPositionForSymbol = openPositions.some(p => p.symbol === data.symbol);
+  
+  // Refresh P&L for all open positions when relevant symbol updates
+  if (hasPositionForSymbol) {
     store.refreshPnL();
   }
   
   // Check pending orders for execution
-  if (store.getPendingOrders().length > 0) {
+  const pendingOrders = store.getPendingOrders();
+  const hasPendingOrderForSymbol = pendingOrders.some(o => o.symbol === data.symbol);
+  
+  if (hasPendingOrderForSymbol) {
     store._checkPendingOrders();
   }
 });
+
+// Auto-subscribe to price updates for symbols with open positions
+setInterval(() => {
+  const store = useTradingStore.getState();
+  const openPositions = store.getOpenPositions();
+  const uniqueSymbols = [...new Set(openPositions.map(p => p.symbol))];
+  
+  // Ensure we're subscribed to all symbols with open positions
+  // This is handled by WebSocket manager, but we ensure P&L is refreshed periodically
+  if (openPositions.length > 0) {
+    store.refreshPnL();
+  }
+}, 1000); // Refresh every second for real-time updates

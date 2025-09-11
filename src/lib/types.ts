@@ -206,20 +206,47 @@ export interface Position {
   symbol: string;
   side: 'long' | 'short';
   size: number;
-  entryPrice: number;
-  currentPrice: number;
-  margin: number;
-  leverage: number;
-  pnl: number;
-  pnlPercentage: number;
-  timestamp: number;
+  
+  // Price tracking - persisted values
+  entryPrice: number;         // Price when position was opened
+  executionPrice: number;      // Actual fill price (may differ due to slippage)
+  currentPrice: number;        // Latest market price (updated real-time)
+  markPrice: number;           // Mark price for P&L calculation
+  closedPrice?: number;        // Price when position was closed
+  
+  // Price history tracking
+  highestPrice: number;        // Highest price since entry
+  lowestPrice: number;         // Lowest price since entry
+  priceHistory: Array<{        // Price snapshots for analytics
+    price: number;
+    timestamp: number;
+    source: 'websocket' | 'api' | 'manual';
+  }>;
+  
+  // Margin and leverage
+  margin: number;              // Initial margin used
+  leverage: number;            // Leverage applied
+  liquidationPrice?: number;   // Calculated liquidation price
+  
+  // P&L tracking - calculated values
+  pnl: number;                 // Current unrealized P&L
+  pnlPercentage: number;       // ROI based on margin (not position value)
+  priceChangePercent: number;  // Price movement percentage
+  realizedPnl?: number;        // P&L when closed
+  
+  // Status and timestamps
+  timestamp: number;           // When position was opened
   status: 'open' | 'closed';
+  closedAt?: number;          // When position was closed
+  lastUpdated: number;        // Last time P&L was calculated
+  
+  // Risk management
   stopLoss?: number;
   takeProfit?: number;
-  closedAt?: number;
-  closedPrice?: number;
-  realizedPnl?: number;
-  liquidationPrice?: number;
+  
+  // Execution quality
+  slippage?: number;          // Difference between expected and execution price
+  timeToFill?: number;        // Milliseconds to fill order
 }
 
 export interface Order {
