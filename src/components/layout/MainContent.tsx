@@ -9,6 +9,7 @@ import { TradingPanel } from '@/components/trading/TradingPanel';
 import { PositionsList } from '@/components/trading/PositionsList';
 import { ChartInterval } from '@/types/chart.types';
 import { AssetSelectorDropdown } from '../trading/AssetSelectorDropdown';
+import { BottomPanel } from './BottomPanel';
 
 interface MainContentProps {
   children?: React.ReactNode;
@@ -47,15 +48,16 @@ export function MainContent({ children }: MainContentProps) {
                 className="h-full"
                 height={typeof window !== 'undefined' ? window.innerHeight - 120 : 600}
               />
+              {/* <BottomPanel /> */}
             </div>
             
             {/* Right Panel - Trading Controls (fixed width, no gap) */}
-            <div className="w-[400px] flex-shrink-0 overflow-auto bg-background border-l border-border/30 shadow-xl">
+            {/* <div className="w-[400px] flex-shrink-0 overflow-auto bg-background border-l border-border/30 shadow-xl">
               <div className="space-y-3 p-4">
                 <TradingPanel className="h-fit" />
                 <PositionsList className="h-fit" maxHeight="350px" />
               </div>
-            </div>
+            </div> */}
           </>
         ) : (
           <div className="flex-1">

@@ -15,6 +15,7 @@ import { MainContent } from './MainContent';
 import { RightPanel } from './RightPanel';
 import { BottomPanel } from './BottomPanel';
 import { TradingPanel } from '../trading/TradingPanel';
+import { PositionsList } from '../trading/PositionsList';
 
 interface TradingLayoutProps {
   children?: React.ReactNode;
@@ -129,38 +130,11 @@ export function TradingLayout({ children }: TradingLayoutProps) {
                 "sidebar bottom"
               `,
           gridTemplateColumns: sidebarCollapsed 
-            ? `0px 1fr`
+            ? `0 1fr`
             : `${sidebarWidth}px 1fr`,
-          gridTemplateRows: `60px 1fr ${bottomPanelHeight}px`,
+          gridTemplateRows: `3.75rem 1fr minmax(12.5rem, ${Math.min(bottomPanelHeight, window?.innerHeight * 0.4 || 300)}px)`,
         }}
-      >
-        {/* Top Navigation Bar */}
-        {/* <motion.div 
-          className="border-b border-gray-200 dark:border-gray-800 bg-card/50 backdrop-blur-sm"
-          style={{ gridArea: 'header' }}
-          initial={{ y: -60, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.3 }}
-        >
-          <TopBar />
-        </motion.div> */}
-        
-        {/* Left Sidebar */}
-        {/* <AnimatePresence>
-          {!sidebarCollapsed && (
-            <motion.div
-              className="border-r border-gray-200 dark:border-gray-800 bg-card/30 backdrop-blur-sm"
-              style={{ gridArea: 'sidebar' }}
-              initial={{ x: -sidebarWidth, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: -sidebarWidth, opacity: 0 }}
-              transition={{ duration: 0.3, ease: 'easeInOut' }}
-            >
-              <Sidebar />
-            </motion.div>
-          )}
-        </AnimatePresence> */}
-        
+      > 
         {/* Main Trading Area */}
         <motion.div
           className="overflow-hidden bg-white dark:bg-gray-900"
@@ -173,19 +147,7 @@ export function TradingLayout({ children }: TradingLayoutProps) {
             {children}
           </MainContent>
         </motion.div>
-        
-        {/* Right Panel */}
-        {/* <motion.div
-          className="border-l border-gray-200 dark:border-gray-800 bg-card/30 backdrop-blur-sm"
-          style={{ gridArea: 'right' }}
-          initial={{ x: rightPanelWidth, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ duration: 0.3, delay: 0.2 }}
-        >
-          <div className="w-80 flex-shrink-0 overflow-auto">
-              <TradingPanel className="h-fit max-h-full" />
-            </div>
-        </motion.div> */}
+        {/* Right Panel */}       
         
         {/* Bottom Panel */}
         <motion.div
