@@ -23,7 +23,7 @@ interface TradingChartProps {
   symbol: string;
   interval?: ChartInterval;
   className?: string;
-  height?: number;
+  height?: number | 'responsive';
   onIntervalChange?: (interval: ChartInterval) => void;
 }
 
@@ -31,7 +31,7 @@ export function TradingChart({
   symbol: propSymbol, 
   interval = '15m',
   className,
-  height = 500,
+  height = 'responsive',
   onIntervalChange
 }: TradingChartProps) {
   const { selectedSymbol } = useUIStore();
@@ -53,6 +53,8 @@ export function TradingChart({
   const [subscriptionId, setSubscriptionId] = useState<string | null>(null);
   const [priceSubscriptionId, setPriceSubscriptionId] = useState<string | null>(null);
   const [isLiveUpdating, setIsLiveUpdating] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [chartHeight, setChartHeight] = useState(500);
   const lastCandleRef = useRef<any>(null);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastPriceUpdateRef = useRef<number>(0);
@@ -62,6 +64,26 @@ export function TradingChart({
   const { subscribeToCandles, subscribeToAllMids, unsubscribe, connected } = useWebSocket();
   const marketStore = useMarketStore();
   
+  // Handle responsive behavior
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      
+      if (height === 'responsive') {
+        const newHeight = mobile ? 300 : window.innerHeight < 800 ? 400 : 500;
+        setChartHeight(newHeight);
+      } else if (typeof height === 'number') {
+        setChartHeight(height);
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    
+    return () => window.removeEventListener('resize', handleResize);
+  }, [height]);
+
   // Initialize chart
   useEffect(() => {
     if (!chartContainerRef.current) return;
@@ -82,7 +104,7 @@ export function TradingChart({
         },
       },
       width: chartContainerRef.current.clientWidth,
-      height,
+      height: chartHeight,
       rightPriceScale: {
         borderColor: '#374151',
         scaleMargins: {
@@ -152,7 +174,7 @@ export function TradingChart({
       window.removeEventListener('resize', handleResize);
       chart.remove();
     };
-  }, [symbol, height]);
+  }, [symbol, chartHeight]);
 
   // Load candle data
   useEffect(() => {
@@ -355,109 +377,203 @@ export function TradingChart({
   return (
     <div className={cn("relative bg-gray-900 rounded-lg overflow-hidden", className)}>
       {/* Chart Toolbar */}
-      <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between p-4 bg-gradient-to-b from-gray-900 to-transparent">
-        <div className="flex items-center gap-4">
-          {/* Asset Selector */}
-          
-          
-          {/* Timeframe Selector */}
-          <div className="flex items-center gap-2">
-            {/* <span className="text-sm font-medium text-gray-400">Timeframe:</span> */}
-            <div className="flex gap-1">
-              {CHART_TIMEFRAMES.map((tf) => (
-              <button
-                key={tf.value}
-                onClick={() => handleIntervalChange(tf.value)}
-                className={cn(
-                  "px-3 py-1 text-xs font-medium rounded transition-colors",
-                  currentInterval === tf.value
-                    ? "bg-primary text-white"
-                    : "bg-gray-800 text-gray-400 hover:bg-gray-700"
-                )}
-              >
-                {tf.label}
-              </button>
-            ))}
+      <div className={cn(
+        "absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-gray-900 to-transparent",
+        isMobile ? "p-2" : "p-4"
+      )}>
+        {/* Mobile Layout */}
+        {isMobile ? (
+          <div className="space-y-2">
+            {/* First Row: Timeframes */}
+            <div className="flex justify-center">
+              <div className="flex gap-1 overflow-x-auto scrollbar-hide">
+                {CHART_TIMEFRAMES.map((tf) => (
+                  <button
+                    key={tf.value}
+                    onClick={() => handleIntervalChange(tf.value)}
+                    className={cn(
+                      "px-2 py-1 text-xs font-medium rounded transition-colors whitespace-nowrap flex-shrink-0",
+                      currentInterval === tf.value
+                        ? "bg-primary text-white"
+                        : "bg-white dark:bg-gray-800 text-gray-400 hover:bg-gray-700"
+                    )}
+                  >
+                    {tf.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {/* Second Row: Status Indicators */}
+            <div className="flex items-center justify-center gap-2">
+              {/* Live Update Indicator */}
+              {isLiveUpdating && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="flex items-center gap-1 px-2 py-1 bg-green-500/20 rounded-full"
+                >
+                  <motion.div
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 1, repeat: Infinity }}
+                    className="w-1.5 h-1.5 bg-green-500 rounded-full"
+                  />
+                  <span className="text-xs font-medium text-green-500">LIVE</span>
+                </motion.div>
+              )}
+              
+              {/* Polling Indicator */}
+              {!connected && !isLoading && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="flex items-center gap-1 px-2 py-1 bg-yellow-500/20 rounded-full"
+                >
+                  <LoaderIcon className="w-2.5 h-2.5 text-yellow-500 animate-spin" />
+                  <span className="text-xs font-medium text-yellow-500">Polling</span>
+                </motion.div>
+              )}
+              
+              {/* Connection Status */}
+              <div className="flex items-center gap-1 px-2 py-1 bg-gray-800 rounded text-xs">
+                <div 
+                  className={cn(
+                    "w-1.5 h-1.5 rounded-full",
+                    connected ? "bg-green-500 animate-pulse" : "bg-red-500"
+                  )}
+                />
+                <span className="text-gray-400">
+                  {connected ? "Live" : "Offline"}
+                </span>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          /* Desktop Layout */
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              {/* Timeframe Selector */}
+              <div className="flex items-center gap-2">
+                <div className="flex gap-1">
+                  {CHART_TIMEFRAMES.map((tf) => (
+                    <button
+                      key={tf.value}
+                      onClick={() => handleIntervalChange(tf.value)}
+                      className={cn(
+                        "px-3 py-1 text-xs font-medium rounded transition-colors",
+                        currentInterval === tf.value
+                          ? "bg-primary text-white"
+                          : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                      )}
+                    >
+                      {tf.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
 
-        {/* Connection Status & Crosshair Data Display */}
-        <div className="flex items-center gap-4">
-          {/* Live Update Indicator */}
-          {isLiveUpdating && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="flex items-center gap-2 px-3 py-1 bg-green-500/20 rounded-full"
-            >
-              <motion.div
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 1, repeat: Infinity }}
-                className="w-2 h-2 bg-green-500 rounded-full"
-              />
-              <span className="text-xs font-medium text-green-500">LIVE</span>
-            </motion.div>
-          )}
-          
-          {/* Polling Indicator */}
-          {!connected && !isLoading && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="flex items-center gap-2 px-3 py-1 bg-yellow-500/20 rounded-full"
-            >
-              <LoaderIcon className="w-3 h-3 text-yellow-500 animate-spin" />
-              <span className="text-xs font-medium text-yellow-500">Polling</span>
-            </motion.div>
-          )}
-          {/* WebSocket Status Indicator */}
-          <div className="flex items-center gap-2 px-2 py-1 bg-gray-800 rounded text-xs">
-            <div 
-              className={cn(
-                "w-2 h-2 rounded-full",
-                connected ? "bg-green-500 animate-pulse" : "bg-red-500"
+            {/* Connection Status & Crosshair Data Display */}
+            <div className="flex items-center gap-4">
+              {/* Live Update Indicator */}
+              {isLiveUpdating && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="flex items-center gap-2 px-3 py-1 bg-green-500/20 rounded-full"
+                >
+                  <motion.div
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 1, repeat: Infinity }}
+                    className="w-2 h-2 bg-green-500 rounded-full"
+                  />
+                  <span className="text-xs font-medium text-green-500">LIVE</span>
+                </motion.div>
               )}
-            />
-            <span className="text-gray-400">
-              {connected ? "Live" : "Offline"}
-            </span>
-            {subscriptionId && (
-              <span className="text-gray-500 ml-2">
-                Candles
-              </span>
-            )}
-          </div>
-
-          {/* Crosshair Data Display */}
-          <AnimatePresence>
-            {crosshairData && (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                className="flex items-center gap-4 px-3 py-1 bg-gray-800 rounded text-xs"
-              >
-                <span className="text-gray-400">Price:</span>
-                <span className="font-mono text-white">${crosshairData.price.toFixed(2)}</span>
-                {crosshairData.volume && (
-                  <>
-                    <span className="text-gray-400">Vol:</span>
-                    <span className="font-mono text-white">{crosshairData.volume.toFixed(2)}</span>
-                  </>
+              
+              {/* Polling Indicator */}
+              {!connected && !isLoading && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="flex items-center gap-2 px-3 py-1 bg-yellow-500/20 rounded-full"
+                >
+                  <LoaderIcon className="w-3 h-3 text-yellow-500 animate-spin" />
+                  <span className="text-xs font-medium text-yellow-500">Polling</span>
+                </motion.div>
+              )}
+              {/* WebSocket Status Indicator */}
+              <div className="flex items-center gap-2 px-2 py-1 bg-gray-800 rounded text-xs">
+                <div 
+                  className={cn(
+                    "w-2 h-2 rounded-full",
+                    connected ? "bg-green-500 animate-pulse" : "bg-red-500"
+                  )}
+                />
+                <span className="text-gray-400">
+                  {connected ? "Live" : "Offline"}
+                </span>
+                {subscriptionId && (
+                  <span className="text-gray-500 ml-2">
+                    Candles
+                  </span>
                 )}
-                <span className="text-gray-400">{crosshairData.time}</span>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+              </div>
+
+              {/* Crosshair Data Display - Hidden on small screens */}
+              <AnimatePresence>
+                {crosshairData && (
+                  <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    className="hidden lg:flex items-center gap-4 px-3 py-1 bg-gray-800 rounded text-xs"
+                  >
+                    <span className="text-gray-400">Price:</span>
+                    <span className="font-mono text-white">${crosshairData.price.toFixed(2)}</span>
+                    {crosshairData.volume && (
+                      <>
+                        <span className="text-gray-400">Vol:</span>
+                        <span className="font-mono text-white">{crosshairData.volume.toFixed(2)}</span>
+                      </>
+                    )}
+                    <span className="text-gray-400">{crosshairData.time}</span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* Mobile Crosshair Data Display */}
+      {isMobile && (
+        <AnimatePresence>
+          {crosshairData && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="absolute top-20 left-2 right-2 z-10 flex items-center justify-center gap-4 px-3 py-2 bg-gray-800/90 rounded text-xs backdrop-blur-sm"
+            >
+              <span className="text-gray-400">Price:</span>
+              <span className="font-mono text-white">${crosshairData.price.toFixed(2)}</span>
+              {crosshairData.volume && (
+                <>
+                  <span className="text-gray-400">Vol:</span>
+                  <span className="font-mono text-white">{crosshairData.volume.toFixed(2)}</span>
+                </>
+              )}
+              <span className="text-gray-400">{crosshairData.time}</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      )}
 
       {/* Chart Container */}
       <div 
         ref={chartContainerRef} 
-        className="w-full"
-        style={{ height }}
+        className="w-full touch-pan-x touch-pan-y"
+        style={{ height: chartHeight }}
       />
 
       {/* Loading Overlay */}
