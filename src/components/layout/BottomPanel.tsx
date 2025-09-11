@@ -20,12 +20,12 @@ import { PositionHeatMap } from '@/components/analytics/PositionHeatMap';
 type BottomPanelTab = 'history' | 'portfolio' | 'analytics' | 'performance' | 'heatmap';
 
 export function BottomPanel() {
-  const [activeTab, setActiveTab] = useState<BottomPanelTab>('history');
+  const [activeTab, setActiveTab] = useState<BottomPanelTab>('analytics');
   const { transactions, positions, orders } = useTradingStore();
   const { metrics } = usePortfolioMetrics();
   
   return (
-    <div className="flex flex-col h-full bg-card/30 backdrop-blur-sm">
+    <div className="flex flex-col bg-card/30 backdrop-blur-sm">
       {/* Tab Header */}
       <div className="flex border-b border-gray-200 dark:border-gray-800 flex-shrink-0 overflow-x-auto">
         <TabButton
@@ -61,14 +61,14 @@ export function BottomPanel() {
       </div>
       
       {/* Tab Content */}
-      <div className="flex-1 overflow-auto">
+      <div className="">
         <motion.div
           key={activeTab}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
           transition={{ duration: 0.2 }}
-          className="h-full overflow-auto"
+          className=""
         >
           {activeTab === 'history' && <HistoryPanel transactions={transactions} />}
           {activeTab === 'portfolio' && <PortfolioPanel positions={positions} />}

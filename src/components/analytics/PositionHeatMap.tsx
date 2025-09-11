@@ -149,9 +149,9 @@ export function PositionHeatMap({ className, showDays = 30 }: PositionHeatMapPro
   }, [heatmapData]);
 
   return (
-    <div className={cn("space-y-6", className)}>
+    <div className={cn("p-2", className)}>
       {/* Header */}
-      <div className="flex items-center justify-between">
+      {/* <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <CalendarIcon className="h-5 w-5 text-primary" />
           <h3 className="text-lg font-semibold">Trading Activity Heatmap</h3>
@@ -159,7 +159,7 @@ export function PositionHeatMap({ className, showDays = 30 }: PositionHeatMapPro
         <div className="text-sm text-muted-foreground">
           Last {showDays} days
         </div>
-      </div>
+      </div> */}
 
       {/* Summary Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -210,109 +210,6 @@ export function PositionHeatMap({ className, showDays = 30 }: PositionHeatMapPro
           </CardContent>
         </Card>
       </div>
-
-      {/* Heatmap Grid */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <ActivityIcon className="h-4 w-4" />
-            Daily Performance Heatmap
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {/* Legend */}
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-muted-foreground">Less</span>
-              <div className="flex items-center gap-1">
-                <div className="w-3 h-3 rounded-sm bg-gray-100 dark:bg-gray-800" />
-                <div className="w-3 h-3 rounded-sm bg-red-100 dark:bg-red-900/20" />
-                <div className="w-3 h-3 rounded-sm bg-red-200 dark:bg-red-900/30" />
-                <div className="w-3 h-3 rounded-sm bg-red-400 dark:bg-red-900/60" />
-                <div className="w-3 h-3 rounded-sm bg-red-500 dark:bg-red-900/80" />
-                <div className="w-2 h-2" /> {/* Spacer */}
-                <div className="w-3 h-3 rounded-sm bg-green-100 dark:bg-green-900/20" />
-                <div className="w-3 h-3 rounded-sm bg-green-200 dark:bg-green-900/30" />
-                <div className="w-3 h-3 rounded-sm bg-green-400 dark:bg-green-900/60" />
-                <div className="w-3 h-3 rounded-sm bg-green-500 dark:bg-green-900/80" />
-              </div>
-              <span className="text-muted-foreground">More</span>
-            </div>
-
-            {/* Weekday labels */}
-            <div className="flex justify-start">
-              <div className="w-6" /> {/* Spacer for alignment */}
-              <div className="grid grid-cols-7 gap-1 text-xs text-muted-foreground">
-                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                  <div key={day} className="text-center w-8">
-                    {day}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Heatmap Grid */}
-            <div className="space-y-1">
-              {weekGroups.map((week, weekIndex) => (
-                <div key={weekIndex} className="flex items-center gap-1">
-                  {/* Month label for first day of week */}
-                  <div className="w-6 text-xs text-muted-foreground text-right">
-                    {week[0] && weekIndex % 4 === 0 ? getDateLabel(
-                      week[0]?.date || new Date().toISOString().split('T')[0]
-                    ).month : ''}
-                  </div>
-                  
-                  {/* Week grid */}
-                  <div className="grid grid-cols-7 gap-1">
-                    {week.map((day, dayIndex) => {
-                      const dateStr = day?.date || '';
-                      const dateLabel = dateStr ? getDateLabel(dateStr) : null;
-                      
-                      return (
-                        <motion.div
-                          key={`${weekIndex}-${dayIndex}`}
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: (weekIndex * 7 + dayIndex) * 0.01 }}
-                          className={cn(
-                            "w-8 h-8 rounded-sm cursor-pointer transition-all hover:scale-110 relative group",
-                            getHeatmapColor(day)
-                          )}
-                          title={day ? (
-                            `${dateLabel?.weekday} ${dateLabel?.month} ${dateLabel?.day}\n` +
-                            `Trades: ${day.trades}\n` +
-                            `P&L: ${formatNumber(day.pnl, { currency: true })}\n` +
-                            `Win Rate: ${day.winRate.toFixed(1)}%`
-                          ) : 'No activity'}
-                        >
-                          {/* Day number for better readability */}
-                          {dateLabel && (
-                            <span className="absolute inset-0 flex items-center justify-center text-xs font-medium opacity-70">
-                              {dateLabel.day}
-                            </span>
-                          )}
-                          
-                          {/* Tooltip */}
-                          {day && (
-                            <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                              <div className="bg-black dark:bg-white text-white dark:text-black px-2 py-1 rounded text-xs whitespace-nowrap">
-                                <div>{dateLabel?.weekday} {dateLabel?.month} {dateLabel?.day}</div>
-                                <div>{day.trades} trades</div>
-                                <div>{formatNumber(day.pnl, { currency: true })}</div>
-                                <div>{day.winRate.toFixed(1)}% wins</div>
-                              </div>
-                            </div>
-                          )}
-                        </motion.div>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Best and Worst Days */}
       {(summaryStats.bestDay || summaryStats.worstDay) && (
@@ -368,6 +265,101 @@ export function PositionHeatMap({ className, showDays = 30 }: PositionHeatMapPro
               </CardContent>
             </Card>
           )}
+      <Card>
+        <CardContent>
+          <div className="space-y-4">
+            {/* Legend */}
+            <div className="flex items-center justify-between text-xs">
+              {/* <span className="text-muted-foreground">Less</span> */}
+              {/* <div className="flex items-center gap-1">
+                <div className="w-3 h-3 rounded-sm bg-gray-100 dark:bg-gray-800" />
+                <div className="w-3 h-3 rounded-sm bg-red-100 dark:bg-red-900/20" />
+                <div className="w-3 h-3 rounded-sm bg-red-200 dark:bg-red-900/30" />
+                <div className="w-3 h-3 rounded-sm bg-red-400 dark:bg-red-900/60" />
+                <div className="w-3 h-3 rounded-sm bg-red-500 dark:bg-red-900/80" />
+                <div className="w-2 h-2" /> 
+                <div className="w-3 h-3 rounded-sm bg-green-100 dark:bg-green-900/20" />
+                <div className="w-3 h-3 rounded-sm bg-green-200 dark:bg-green-900/30" />
+                <div className="w-3 h-3 rounded-sm bg-green-400 dark:bg-green-900/60" />
+                <div className="w-3 h-3 rounded-sm bg-green-500 dark:bg-green-900/80" />
+              </div> */}
+              {/* <span className="text-muted-foreground">More</span> */}
+            </div>
+
+            {/* Weekday labels */}
+            <div className="flex justify-start">
+              <div className="w-6" /> {/* Spacer for alignment */}
+              <div className="grid grid-cols-7 gap-1 text-xs text-muted-foreground">
+                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                  <div key={day} className="text-center w-8">
+                    {day}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Heatmap Grid */}
+            <div className="space-y-1">
+              {weekGroups.map((week, weekIndex) => (
+                <div key={weekIndex} className="flex items-center gap-1">
+                  
+                  <div className="w-6 text-xs text-muted-foreground text-right">
+                    {week[0] && weekIndex % 4 === 0 ? getDateLabel(
+                      week[0]?.date || new Date().toISOString().split('T')[0]
+                    ).month : ''}
+                  </div>
+                  
+                  
+                  <div className="grid grid-cols-7 gap-1">
+                    {week.map((day, dayIndex) => {
+                      const dateStr = day?.date || '';
+                      const dateLabel = dateStr ? getDateLabel(dateStr) : null;
+                      
+                      return (
+                        <motion.div
+                          key={`${weekIndex}-${dayIndex}`}
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: (weekIndex * 7 + dayIndex) * 0.01 }}
+                          className={cn(
+                            "w-8 h-8 rounded-sm cursor-pointer transition-all hover:scale-110 relative group",
+                            getHeatmapColor(day)
+                          )}
+                          title={day ? (
+                            `${dateLabel?.weekday} ${dateLabel?.month} ${dateLabel?.day}\n` +
+                            `Trades: ${day.trades}\n` +
+                            `P&L: ${formatNumber(day.pnl, { currency: true })}\n` +
+                            `Win Rate: ${day.winRate.toFixed(1)}%`
+                          ) : 'No activity'}
+                        >
+                          
+                          {dateLabel && (
+                            <span className="absolute inset-0 flex items-center justify-center text-xs font-medium opacity-70">
+                              {dateLabel.day}
+                            </span>
+                          )}
+                          
+                          
+                          {day && (
+                            <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                              <div className="bg-black dark:bg-white text-white dark:text-black px-2 py-1 rounded text-xs whitespace-nowrap">
+                                <div>{dateLabel?.weekday} {dateLabel?.month} {dateLabel?.day}</div>
+                                <div>{day.trades} trades</div>
+                                <div>{formatNumber(day.pnl, { currency: true })}</div>
+                                <div>{day.winRate.toFixed(1)}% wins</div>
+                              </div>
+                            </div>
+                          )}
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
         </div>
       )}
     </div>

@@ -28,7 +28,7 @@ export function MainContent({ children }: MainContentProps) {
   }
   
   return (
-    <div className="h-full overflow-hidden">
+    <div className="h-full">
       <motion.div
         className="h-full flex"
         initial={{ opacity: 0, y: 20 }}
@@ -36,29 +36,29 @@ export function MainContent({ children }: MainContentProps) {
         transition={{ duration: 0.3 }}
       >
         {selectedSymbol ? (
-          <>
-          
+          <div className='flex w-full flex-row h-screen'>
             {/* Left Panel - Chart Area (fills remaining space) */}
-            <div className="flex-1 min-w-0 overflow-hidden p-4 pr-0">
+            <div className="flex-1 p-4 pr-0 overflow-scroll">
               <AssetSelectorDropdown />
               <TradingChart
                 symbol={selectedSymbol}
                 interval={chartInterval}
                 onIntervalChange={setChartInterval}
-                className="h-full"
-                height={typeof window !== 'undefined' ? window.innerHeight - 120 : 600}
+                className="h-[50%]"
+                height={typeof window !== 'undefined' ? window.innerHeight - 500 : 600}
               />
-              {/* <BottomPanel /> */}
+              <BottomPanel />
             </div>
             
             {/* Right Panel - Trading Controls (fixed width, no gap) */}
-            {/* <div className="w-[400px] flex-shrink-0 overflow-auto bg-background border-l border-border/30 shadow-xl">
+            <div className="w-[400px] flex-shrink-0 bg-background border-l border-border/30 shadow-xl overflow-scroll">
               <div className="space-y-3 p-4">
                 <TradingPanel className="h-fit" />
                 <PositionsList className="h-fit" maxHeight="350px" />
               </div>
-            </div> */}
-          </>
+            </div>
+
+          </div>
         ) : (
           <div className="flex-1">
             <Card className="h-full">

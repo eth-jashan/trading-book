@@ -113,31 +113,14 @@ export function TradingLayout({ children }: TradingLayoutProps) {
   }
   
   return (
-    <div className="h-screen w-full overflow-hidden bg-white dark:bg-gray-900 text-foreground">
+    <div className="h-screen w-full bg-white dark:bg-gray-900 text-foreground">
       {/* Main Layout Grid */}
       <div 
-        className="grid h-full transition-all duration-300 ease-in-out"
-        style={{
-          gridTemplateAreas: sidebarCollapsed
-            ? `
-                "header header"
-                "main main"
-                "bottom bottom"
-              `
-            : `
-                "sidebar header"
-                "sidebar main"
-                "sidebar bottom"
-              `,
-          gridTemplateColumns: sidebarCollapsed 
-            ? `0 1fr`
-            : `${sidebarWidth}px 1fr`,
-          gridTemplateRows: `3.75rem 1fr minmax(12.5rem, ${Math.min(bottomPanelHeight, window?.innerHeight * 0.4 || 300)}px)`,
-        }}
+        className="h-full transition-all duration-300 ease-in-out"
       > 
         {/* Main Trading Area */}
         <motion.div
-          className="overflow-hidden bg-white dark:bg-gray-900"
+          className="bg-white dark:bg-gray-900"
           style={{ gridArea: 'main' }}
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -147,10 +130,10 @@ export function TradingLayout({ children }: TradingLayoutProps) {
             {children}
           </MainContent>
         </motion.div>
-        {/* Right Panel */}       
+            
         
         {/* Bottom Panel */}
-        <motion.div
+        {/* <motion.div
           className="border-t border-gray-200 dark:border-gray-800 bg-card/30 backdrop-blur-sm"
           style={{ gridArea: 'bottom' }}
           initial={{ y: bottomPanelHeight, opacity: 0 }}
@@ -158,11 +141,10 @@ export function TradingLayout({ children }: TradingLayoutProps) {
           transition={{ duration: 0.3, delay: 0.3 }}
         >
           <BottomPanel />
-        </motion.div>
+        </motion.div> */}
       </div>
       
-      {/* Connection Status Indicator */}
-      {/* <ConnectionIndicator /> */}
+     
       
       {/* Global Toast Notifications */}
       <Toaster

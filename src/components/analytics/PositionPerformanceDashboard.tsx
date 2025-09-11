@@ -133,10 +133,10 @@ export function PositionPerformanceDashboard({ className }: PositionPerformanceP
   return (
     <div className={cn("space-y-6", className)}>
       {/* Header */}
-      <div className="flex items-center gap-2">
+      {/* <div className="flex items-center gap-2">
         <BarChart3Icon className="h-5 w-5 text-primary" />
         <h2 className="text-lg font-semibold">Position Performance Analytics</h2>
-      </div>
+      </div> */}
 
       {/* Key Performance Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
