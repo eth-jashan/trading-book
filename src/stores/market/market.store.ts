@@ -21,6 +21,9 @@ interface MarketState {
   candles: Map<string, Map<string, Candle[]>>; // symbol -> interval -> candles
   priceHistory: Map<string, Array<{ price: number; timestamp: number }>>;
   
+  // Market type filtering
+  marketTypeFilter: 'all' | 'spot' | 'perpetual';
+  
   // Enhanced market data
   marketStatistics: MarketStatistics;
   loadingState: AsyncState;
@@ -65,6 +68,8 @@ interface MarketState {
     topVolume: PriceData[];
     marketCap: number;
   };
+  getPricesByType: (type: 'all' | 'spot' | 'perpetual') => PriceData[];
+  setMarketTypeFilter: (filter: 'all' | 'spot' | 'perpetual') => void;
   
   // Subscriptions
   addSubscription: (subscription: string) => void;
@@ -77,8 +82,8 @@ interface MarketState {
 
 // Add some initial mock data for testing
 const mockPrices = new Map<string, PriceData>();
-mockPrices.set('BTC-USD', {
-  symbol: 'BTC-USD',
+mockPrices.set('BTC', {
+  symbol: 'BTC',
   price: 43250.50,
   change24h: 1250.75,
   changePercent24h: 2.98,
@@ -89,10 +94,14 @@ mockPrices.set('BTC-USD', {
   bid: 43248.25,
   ask: 43252.75,
   spread: 4.50,
+  marketType: 'perpetual',
+  displayName: 'BTC',
+  baseAsset: 'BTC',
+  quoteAsset: 'USD'
 });
 
-mockPrices.set('ETH-USD', {
-  symbol: 'ETH-USD',
+mockPrices.set('ETH', {
+  symbol: 'ETH',
   price: 2648.75,
   change24h: -85.25,
   changePercent24h: -3.12,
@@ -103,10 +112,14 @@ mockPrices.set('ETH-USD', {
   bid: 2647.50,
   ask: 2649.00,
   spread: 1.50,
+  marketType: 'perpetual',
+  displayName: 'ETH',
+  baseAsset: 'ETH',
+  quoteAsset: 'USD'
 });
 
-mockPrices.set('SOL-USD', {
-  symbol: 'SOL-USD',
+mockPrices.set('SOL', {
+  symbol: 'SOL',
   price: 98.45,
   change24h: 4.25,
   changePercent24h: 4.51,
@@ -117,6 +130,10 @@ mockPrices.set('SOL-USD', {
   bid: 98.35,
   ask: 98.55,
   spread: 0.20,
+  marketType: 'perpetual',
+  displayName: 'SOL',
+  baseAsset: 'SOL',
+  quoteAsset: 'USD'
 });
 
 const initialMarketStats: MarketStatistics = {
@@ -142,6 +159,9 @@ const initialState = {
   orderBooks: new Map<string, OrderBook>(),
   candles: new Map<string, Map<string, Candle[]>>(),
   priceHistory: new Map<string, Array<{ price: number; timestamp: number }>>(),
+  
+  // Market type filtering
+  marketTypeFilter: 'all' as const,
   
   // Enhanced market data
   marketStatistics: initialMarketStats,
@@ -522,6 +542,23 @@ export const useMarketStore = create<MarketState>()(
           topVolume,
           marketCap: totalMarketCap,
         };
+      },
+      
+      getPricesByType: (type: 'all' | 'spot' | 'perpetual'): PriceData[] => {
+        const state = get() as MarketState;
+        const prices: PriceData[] = Array.from(state.prices.values());
+        
+        if (type === 'all') {
+          return prices;
+        }
+        
+        return prices.filter((p: PriceData) => p.marketType === type);
+      },
+      
+      setMarketTypeFilter: (filter: 'all' | 'spot' | 'perpetual') => {
+        set((state: MarketState): void => {
+          state.marketTypeFilter = filter;
+        });
       },
       
       // Subscriptions

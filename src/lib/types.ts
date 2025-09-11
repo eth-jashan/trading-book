@@ -44,6 +44,14 @@ export interface PriceData {
   spread?: number;
   timestamp: number;
   priceHistory?: Array<{ price: number; timestamp: number }>;
+  // Enhanced fields for better display
+  marketType?: 'spot' | 'perpetual';
+  displayName?: string;
+  apiSymbol?: string;
+  baseAsset?: string;
+  quoteAsset?: string;
+  fundingRate?: number; // For perpetuals
+  openInterest?: number; // For perpetuals
 }
 
 export interface OrderBook {
@@ -92,7 +100,7 @@ export interface HyperliquidSpotMeta {
 
 export interface HyperliquidSpotMarket {
   name: string;
-  tokens: [string, string]; // [base, quote]
+  tokens: string[]; // Array of token indices as strings
   index: number;
   isCanonical?: boolean;
 }

@@ -135,7 +135,7 @@ const initialState: Omit<UIState, 'setTheme' | 'toggleSidebar' | 'setSidebarWidt
   },
   
   // Selections
-  selectedSymbol: 'BTC-USD', // Default to BTC-USD
+  selectedSymbol: 'BTC', // Default to BTC
   selectedPosition: null,
   selectedOrder: null,
   

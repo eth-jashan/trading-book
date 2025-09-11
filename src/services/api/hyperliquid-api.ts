@@ -24,7 +24,7 @@ class HyperliquidAPIService {
   private baseURL = API_CONFIG.HYPERLIQUID_BASE_URL;
   private timeout = API_CONFIG.REQUEST_TIMEOUT;
   private lastRequestTime = 0;
-  private minRequestInterval = 30000; // 30 seconds minimum between requests
+  private minRequestInterval = 3000; // 30 seconds minimum between requests
   private chartDataCache = new Map<string, { data: CandleData[]; timestamp: number }>();
   private cacheExpiry = 60000; // 1 minute cache
   

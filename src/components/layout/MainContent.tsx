@@ -8,6 +8,7 @@ import { TradingChart } from '@/components/chart/TradingChart';
 import { TradingPanel } from '@/components/trading/TradingPanel';
 import { PositionsList } from '@/components/trading/PositionsList';
 import { ChartInterval } from '@/types/chart.types';
+import { AssetSelectorDropdown } from '../trading/AssetSelectorDropdown';
 
 interface MainContentProps {
   children?: React.ReactNode;
@@ -35,8 +36,10 @@ export function MainContent({ children }: MainContentProps) {
       >
         {selectedSymbol ? (
           <>
+          
             {/* Left Panel - Chart Area (fills remaining space) */}
             <div className="flex-1 min-w-0 overflow-hidden p-4 pr-0">
+              <AssetSelectorDropdown />
               <TradingChart
                 symbol={selectedSymbol}
                 interval={chartInterval}

@@ -12,10 +12,12 @@ import {
 import { useHyperliquidAPI } from '@/services/api/hyperliquid-api';
 import { useWebSocket } from '@/services/websocket/websocket-manager';
 import { useMarketStore } from '@/stores/market/market.store';
+import { useUIStore } from '@/stores';
 import { ChartInterval, CHART_TIMEFRAMES } from '@/types/chart.types';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LoaderIcon } from 'lucide-react';
+import { AssetSelectorDropdown } from '@/components/trading/AssetSelectorDropdown';
 
 interface TradingChartProps {
   symbol: string;
@@ -26,12 +28,14 @@ interface TradingChartProps {
 }
 
 export function TradingChart({ 
-  symbol, 
+  symbol: propSymbol, 
   interval = '15m',
   className,
   height = 500,
   onIntervalChange
 }: TradingChartProps) {
+  const { selectedSymbol } = useUIStore();
+  const symbol = selectedSymbol || propSymbol || 'BTC';
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const candleSeriesRef = useRef<any>(null);
@@ -49,15 +53,15 @@ export function TradingChart({
   const [subscriptionId, setSubscriptionId] = useState<string | null>(null);
   const [priceSubscriptionId, setPriceSubscriptionId] = useState<string | null>(null);
   const [isLiveUpdating, setIsLiveUpdating] = useState(false);
-  const [lastCandle, setLastCandle] = useState<any>(null);
+  const lastCandleRef = useRef<any>(null);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastPriceUpdateRef = useRef<number>(0);
-  const UPDATE_THROTTLE_MS = 500; // Throttle updates to max 2 per second
+  const UPDATE_THROTTLE_MS = 100; // Throttle updates to max 10 per second for smoother updates
   
   const { getChartCandles, getAllMids } = useHyperliquidAPI();
   const { subscribeToCandles, subscribeToAllMids, unsubscribe, connected } = useWebSocket();
   const marketStore = useMarketStore();
-
+  
   // Initialize chart
   useEffect(() => {
     if (!chartContainerRef.current) return;
@@ -131,24 +135,7 @@ export function TradingChart({
     volumeSeriesRef.current = volumeSeries;
 
     // Handle crosshair movement
-    // chart.subscribeCrosshairMove((param: MouseEventParams) => {
-    //   if (!param || !param.time || !param.point) {
-    //     setCrosshairData(null);
-    //     return;
-    //   }
-
-    //   const candleData = param.seriesData.get(candleSeries);
-    //   const volumeData = param.seriesData.get(volumeSeries);
-
-    //   if (candleData) {
-    //     const candle = candleData as any;
-    //     setCrosshairData({
-    //       price: candle.close,
-    //       time: new Date((param.time as number) * 1000).toLocaleString(),
-    //       volume: (volumeData as any)?.value,
-    //     });
-    //   }
-    // });
+    
 
     // Handle resize
     const handleResize = () => {
@@ -196,9 +183,25 @@ export function TradingChart({
           color: candle.close >= candle.open ? '#10B98180' : '#EF444480',
         }));
         volumeSeriesRef.current.setData(volumeData);
-
         // Fit content
-        chartRef.current?.timeScale().fitContent();
+            chartRef.current?.timeScale().fitContent();
+              // // Sort by time
+              const chartCandles = candles.sort((a: any, b: any) => a.time - b.time);
+      
+              // // Update chart series
+              // candleSeriesRef.current.setData(chartCandles);
+      
+              // Update volume data
+              
+              
+              console.log("setting the value.....................",chartCandles)
+              // Store last candle for real-time updates
+              if (chartCandles.length > 0) {
+                lastCandleRef.current = chartCandles[chartCandles.length - 1];
+              }
+              
+              setLastUpdateTime(Date.now());
+            
 
       } catch (err) {
         console.error('Failed to load chart data:', err);
@@ -232,53 +235,9 @@ export function TradingChart({
     };
   }, [symbol, currentInterval, connected, isLoading]);
 
-  // Listen for candle updates from market store
-  useEffect(() => {
-    if (!symbol || !currentInterval || !candleSeriesRef.current || !volumeSeriesRef.current) return;
-
-    const unsubscribeStore = useMarketStore.subscribe((state) => {
-      const symbolCandles = state.candles.get(symbol);
-      const candles = symbolCandles?.get(currentInterval);
-      if (candles && candles.length > 0) {
-        console.log('Updating chart with new candles from store:', candles.length);
-        
-        // Convert candles to Lightweight Charts format
-        const chartCandles = candles.map((candle: any) => ({
-          time: Math.floor(candle.timestamp / 1000) as any,
-          open: candle.open,
-          high: candle.high,
-          low: candle.low,
-          close: candle.close,
-          volume: candle.volume,
-        }));
-
-        // Sort by time
-        chartCandles.sort((a: any, b: any) => a.time - b.time);
-
-        // Update chart series
-        candleSeriesRef.current.setData(chartCandles);
-
-        // Update volume data
-        const volumeData = chartCandles.map((candle: any) => ({
-          time: candle.time,
-          value: candle.volume || 0,
-          color: candle.close >= candle.open ? '#10B98180' : '#EF444480',
-        }));
-        volumeSeriesRef.current.setData(volumeData);
-        
-        // Store last candle for real-time updates
-        if (chartCandles.length > 0) {
-          setLastCandle(chartCandles[chartCandles.length - 1]);
-        }
-        
-        setLastUpdateTime(Date.now());
-      }
-    });
-
-    return unsubscribeStore;
-  }, [symbol, currentInterval]);
-
+ 
   // Subscribe to real-time price updates
+  
   useEffect(() => {
     if (!symbol || isLoading || !candleSeriesRef.current) return;
 
@@ -290,12 +249,11 @@ export function TradingChart({
       priceSubId = subscribeToAllMids();
       setPriceSubscriptionId(priceSubId);
       setIsLiveUpdating(true);
-
+      console.log("update here.............")
       // Listen for price updates for our symbol
       unsubscribePrices = useMarketStore.subscribe((state) => {
         const price = state.prices.get(symbol);
-        const currentLastCandle = lastCandle; // Capture latest value in closure
-        if (price && currentLastCandle) {
+        if (price && lastCandleRef.current) {
           // Throttle updates to prevent excessive re-renders
           const now = Date.now();
           if (now - lastPriceUpdateRef.current < UPDATE_THROTTLE_MS) {
@@ -305,12 +263,15 @@ export function TradingChart({
           
           // Update the current candle with the new price
           const updatedCandle = {
-            ...currentLastCandle,
+            ...lastCandleRef.current,
             close: price.price,
-            high: Math.max(currentLastCandle.high, price.price),
-            low: Math.min(currentLastCandle.low, price.price),
+            high: Math.max(lastCandleRef.current.high, price.price),
+            low: Math.min(lastCandleRef.current.low, price.price),
           };
-
+          
+          // Update the ref with the new candle state
+          lastCandleRef.current = updatedCandle;
+          console.log("updating chart............",updatedCandle)
           // Update only the last candle
           candleSeriesRef.current?.update(updatedCandle);
           
@@ -333,16 +294,19 @@ export function TradingChart({
           const mids = await getAllMids();
           const price = mids[symbol];
           
-          if (price && lastCandle) {
+          if (price && lastCandleRef.current) {
             const priceNum = parseFloat(price);
             
             // No need to throttle polling since it's already limited to every 2 seconds
             const updatedCandle = {
-              ...lastCandle,
+              ...lastCandleRef.current,
               close: priceNum,
-              high: Math.max(lastCandle.high, priceNum),
-              low: Math.min(lastCandle.low, priceNum),
+              high: Math.max(lastCandleRef.current.high, priceNum),
+              low: Math.min(lastCandleRef.current.low, priceNum),
             };
+            
+            // Update the ref with the new candle state
+            lastCandleRef.current = updatedCandle;
 
             // Update only the last candle
             candleSeriesRef.current?.update(updatedCandle);
@@ -381,7 +345,7 @@ export function TradingChart({
       }
       setIsLiveUpdating(false);
     };
-  }, [connected, symbol, isLoading]); // Removed function dependencies that cause re-renders
+  }, [connected, symbol, isLoading, getAllMids, subscribeToAllMids, unsubscribe]); // Include necessary dependencies
 
   const handleIntervalChange = (newInterval: ChartInterval) => {
     setCurrentInterval(newInterval);
@@ -392,10 +356,15 @@ export function TradingChart({
     <div className={cn("relative bg-gray-900 rounded-lg overflow-hidden", className)}>
       {/* Chart Toolbar */}
       <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between p-4 bg-gradient-to-b from-gray-900 to-transparent">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-gray-400">Timeframe:</span>
-          <div className="flex gap-1">
-            {CHART_TIMEFRAMES.map((tf) => (
+        <div className="flex items-center gap-4">
+          {/* Asset Selector */}
+          
+          
+          {/* Timeframe Selector */}
+          <div className="flex items-center gap-2">
+            {/* <span className="text-sm font-medium text-gray-400">Timeframe:</span> */}
+            <div className="flex gap-1">
+              {CHART_TIMEFRAMES.map((tf) => (
               <button
                 key={tf.value}
                 onClick={() => handleIntervalChange(tf.value)}
@@ -409,6 +378,7 @@ export function TradingChart({
                 {tf.label}
               </button>
             ))}
+            </div>
           </div>
         </div>
 
