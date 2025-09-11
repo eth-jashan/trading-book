@@ -51,9 +51,7 @@ export function OrderTypeSelector({
 
   return (
     <div className={cn("space-y-2", className)}>
-      <label className="text-sm font-medium text-foreground">
-        Order Type
-      </label>
+      
       
       <div className="relative bg-muted/30 p-1.5 rounded-xl border border-border/20">
         {/* Sliding background indicator */}

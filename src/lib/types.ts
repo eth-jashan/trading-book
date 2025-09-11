@@ -143,6 +143,12 @@ export interface AssetWithMarketData extends Asset {
   marketRank?: number;
   isGainer?: boolean;
   isLoser?: boolean;
+  priceHistory?: Array<{ price: number; timestamp: number }>;
+  priceChangePercent24h?: number;
+  volume24h?: number;
+  marketCap?: number;
+  high24h?: number;
+  low24h?: number;
 }
 
 // API State Types

@@ -51,12 +51,12 @@ export function MainContent({ children }: MainContentProps) {
             </div>
             
             {/* Right Panel - Trading Controls (fixed width, no gap) */}
-            <div className="w-[400px] flex-shrink-0 bg-background border-l border-border/30 shadow-xl overflow-scroll">
+            {/* <div className="w-[400px] flex-shrink-0 bg-background border-l border-border/30 shadow-xl overflow-scroll">
               <div className="space-y-3 p-4">
                 <TradingPanel className="h-fit" />
                 <PositionsList className="h-fit" maxHeight="350px" />
               </div>
-            </div>
+            </div> */}
 
           </div>
         ) : (

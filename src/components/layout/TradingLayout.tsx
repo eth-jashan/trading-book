@@ -1,21 +1,15 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useUIStore, useConnectionState } from '@/stores';
+import { motion } from 'framer-motion';
+import { useUIStore } from '@/stores';
 import { websocketManager } from '@/services/websocket/websocket-manager';
 import { hyperliquidAPI } from '@/services/api/hyperliquid-api';
 import { cn } from '@/lib/utils';
 import { Toaster } from 'react-hot-toast';
-
-// Import sub-components (we'll create these)
-import { TopBar } from './TopBar';
-import { Sidebar } from './Sidebar';
 import { MainContent } from './MainContent';
-import { RightPanel } from './RightPanel';
-import { BottomPanel } from './BottomPanel';
-import { TradingPanel } from '../trading/TradingPanel';
-import { PositionsList } from '../trading/PositionsList';
+
+
 
 interface TradingLayoutProps {
   children?: React.ReactNode;
@@ -130,18 +124,6 @@ export function TradingLayout({ children }: TradingLayoutProps) {
             {children}
           </MainContent>
         </motion.div>
-            
-        
-        {/* Bottom Panel */}
-        {/* <motion.div
-          className="border-t border-gray-200 dark:border-gray-800 bg-card/30 backdrop-blur-sm"
-          style={{ gridArea: 'bottom' }}
-          initial={{ y: bottomPanelHeight, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.3, delay: 0.3 }}
-        >
-          <BottomPanel />
-        </motion.div> */}
       </div>
       
      
@@ -169,68 +151,7 @@ export function TradingLayout({ children }: TradingLayoutProps) {
           },
         }}
       />
-      
-      {/* Loading States & Modals would go here */}
     </div>
   );
 }
-
-// Connection Status Indicator Component
-function ConnectionIndicator() {
-  const [connectionState, setConnectionState] = useState(websocketManager.getConnectionState());
-  
-  useEffect(() => {
-    const updateInterval = setInterval(() => {
-      setConnectionState(websocketManager.getConnectionState());
-    }, 1000);
-    
-    return () => clearInterval(updateInterval);
-  }, []);
-  
-  if (connectionState.connected) {
-    return (
-      <div className="fixed bottom-4 right-4 z-50">
-        <motion.div
-          className="flex items-center gap-2 px-3 py-2 rounded-full bg-success/10 border border-success/20 text-green-500 text-xs font-medium"
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0, opacity: 0 }}
-        >
-          <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
-          Live ({connectionState.latency}ms)
-        </motion.div>
-      </div>
-    );
-  }
-  
-  if (connectionState.connecting) {
-    return (
-      <div className="fixed bottom-4 right-4 z-50">
-        <motion.div
-          className="flex items-center gap-2 px-3 py-2 rounded-full bg-warning/10 border border-warning/20 text-warning text-xs font-medium"
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-        >
-          <div className="w-2 h-2 rounded-full bg-warning animate-spin" />
-          Connecting...
-        </motion.div>
-      </div>
-    );
-  }
-  
-  return (
-    <div className="fixed bottom-4 right-4 z-50">
-      <motion.div
-        className="flex items-center gap-2 px-3 py-2 rounded-full bg-destructive/10 border border-destructive/20 text-destructive text-xs font-medium cursor-pointer hover:bg-destructive/20"
-        initial={{ scale: 0, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        onClick={() => websocketManager.connect()}
-      >
-        <div className="w-2 h-2 rounded-full bg-destructive" />
-        Disconnected (Click to reconnect)
-      </motion.div>
-    </div>
-  );
-}
-
 export default TradingLayout;
