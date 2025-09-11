@@ -337,51 +337,12 @@ function HistoryPanel({ transactions }: { transactions: any[] }) {
             <HistoryIcon className="h-5 w-5" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold">Transaction History</h3>
+            {/* <h3 className="text-lg font-semibold">Transaction History</h3> */}
             <p className="text-sm text-muted-foreground">{transactions.length} total transactions</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          {/* Search */}
-          {/* <div className="relative">
-            <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder="Search transactions..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 text-sm border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary w-48"
-            />
-          </div> */}
-
-          {/* Type Filter */}
-          {/* <div className="flex items-center gap-1 p-1 bg-accent rounded-lg">
-            {(['all', 'deposit', 'trade', 'realized_pnl'] as const).map((type) => (
-              <button
-                key={type}
-                onClick={() => setFilterType(type)}
-                className={cn(
-                  'px-3 py-1.5 text-xs font-medium rounded transition-colors capitalize',
-                  filterType === type
-                    ? 'bg-primary text-primary-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
-                )}
-              >
-                {type === 'all' ? 'All' : type.replace('_', ' ')}
-              </button>
-            ))}
-          </div> */}
-
-          {/* Sort Order */}
-          {/* <button
-            onClick={() => setSortOrder(sortOrder === 'newest' ? 'oldest' : 'newest')}
-            className="p-2 rounded-lg bg-accent hover:bg-accent/80 transition-colors"
-            title={`Sort by ${sortOrder === 'newest' ? 'oldest first' : 'newest first'}`}
-          >
-            {sortOrder === 'newest' ? <SortDescIcon className="h-4 w-4" /> : <SortAscIcon className="h-4 w-4" />}
-          </button> */}
-        </div>
+       
       </div>
 
       {/* Transaction Summary Cards */}
@@ -576,7 +537,7 @@ function PortfolioPanel({ positions }: { positions: any[] }) {
             <WalletIcon className="h-5 w-5" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold">Portfolio Positions</h3>
+            {/* <h3 className="text-lg font-semibold">Portfolio Positions</h3> */}
             <p className="text-sm text-muted-foreground">
               {openPositions.length} open • {closedPositions.length} closed positions
             </p>
@@ -585,7 +546,7 @@ function PortfolioPanel({ positions }: { positions: any[] }) {
 
         <div className="flex items-center gap-2">
           {/* Search */}
-          <div className="relative">
+          {/* <div className="relative">
             <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <input
               type="text"
@@ -594,7 +555,7 @@ function PortfolioPanel({ positions }: { positions: any[] }) {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 pr-4 py-2 text-sm border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary w-44"
             />
-          </div>
+          </div> */}
 
           {/* View Selector */}
           <div className="flex items-center gap-1 p-1 bg-accent rounded-lg">
@@ -615,7 +576,7 @@ function PortfolioPanel({ positions }: { positions: any[] }) {
           </div>
 
           {/* Sort Selector */}
-          <select
+          {/* <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as 'pnl' | 'size' | 'symbol')}
             className="px-3 py-2 text-sm border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
@@ -623,7 +584,7 @@ function PortfolioPanel({ positions }: { positions: any[] }) {
             <option value="pnl">Sort by P&L</option>
             <option value="size">Sort by Size</option>
             <option value="symbol">Sort by Symbol</option>
-          </select>
+          </select> */}
         </div>
       </div>
 

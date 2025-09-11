@@ -150,58 +150,12 @@ export function PositionPerformanceDashboard({ className }: PositionPerformanceP
             <BarChart3Icon className="h-5 w-5" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold">Performance Analytics</h3>
+            {/* <h3 className="text-lg font-semibold">Performance Analytics</h3> */}
             <p className="text-sm text-muted-foreground">Comprehensive trading performance overview</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          {/* Timeframe Selector */}
-          <div className="flex items-center gap-1 p-1 bg-accent rounded-lg">
-            {(['all', '7d', '30d', '90d'] as const).map((timeframe) => (
-              <button
-                key={timeframe}
-                onClick={() => setSelectedTimeframe(timeframe)}
-                className={cn(
-                  'px-3 py-1.5 text-sm font-medium rounded transition-colors',
-                  selectedTimeframe === timeframe
-                    ? 'bg-primary text-primary-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
-                )}
-              >
-                {timeframe.toUpperCase()}
-              </button>
-            ))}
-          </div>
-
-          {/* View Mode Selector */}
-          <div className="flex items-center gap-1 p-1 bg-accent rounded-lg">
-            <button
-              onClick={() => setViewMode('overview')}
-              className={cn(
-                'p-1.5 rounded transition-colors',
-                viewMode === 'overview'
-                  ? 'bg-primary text-primary-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              )}
-              title="Overview"
-            >
-              <BarChart3Icon className="h-4 w-4" />
-            </button>
-            <button
-              onClick={() => setViewMode('detailed')}
-              className={cn(
-                'p-1.5 rounded transition-colors',
-                viewMode === 'detailed'
-                  ? 'bg-primary text-primary-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              )}
-              title="Detailed"
-            >
-              <PieChartIcon className="h-4 w-4" />
-            </button>
-          </div>
-        </div>
+       
       </div>
 
       {/* Performance Summary Cards */}
