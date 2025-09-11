@@ -188,7 +188,7 @@ export function TradingLayout({ children }: TradingLayoutProps) {
         </motion.div> */}
         
         {/* Bottom Panel */}
-        {/* <motion.div
+        <motion.div
           className="border-t border-gray-200 dark:border-gray-800 bg-card/30 backdrop-blur-sm"
           style={{ gridArea: 'bottom' }}
           initial={{ y: bottomPanelHeight, opacity: 0 }}
@@ -196,7 +196,7 @@ export function TradingLayout({ children }: TradingLayoutProps) {
           transition={{ duration: 0.3, delay: 0.3 }}
         >
           <BottomPanel />
-        </motion.div> */}
+        </motion.div>
       </div>
       
       {/* Connection Status Indicator */}
