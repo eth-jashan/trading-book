@@ -111,7 +111,7 @@ export function BottomPanel() {
           </div>
 
           {/* Desktop: Tab Actions */}
-          <div className="hidden lg:flex items-center gap-2 ml-4 flex-shrink-0">
+          {/* <div className="hidden lg:flex items-center gap-2 ml-4 flex-shrink-0">
             <div className="h-4 w-px bg-border" />
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -121,7 +121,7 @@ export function BottomPanel() {
             >
               <MoreHorizontalIcon className="h-4 w-4 text-muted-foreground" />
             </motion.button>
-          </div>
+          </div> */}
 
           {/* Mobile: Compact More Button */}
           <div className="lg:hidden flex items-center ml-2 flex-shrink-0">

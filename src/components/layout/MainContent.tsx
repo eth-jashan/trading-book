@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useUIStore } from '@/stores';
 import { Card, CardContent } from '@/components/ui/card';
 import { TradingChart } from '@/components/chart/TradingChart';
@@ -10,6 +10,8 @@ import { PositionsList } from '@/components/trading/PositionsList';
 import { ChartInterval } from '@/types/chart.types';
 import { AssetSelectorDropdown } from '../trading/AssetSelectorDropdown';
 import { BottomPanel } from './BottomPanel';
+import { Button } from '@/components/ui/button';
+import { TrendingUp, X, BarChart3 } from 'lucide-react';
 
 interface MainContentProps {
   children?: React.ReactNode;
@@ -18,6 +20,7 @@ interface MainContentProps {
 export function MainContent({ children }: MainContentProps) {
   const { selectedSymbol } = useUIStore();
   const [chartInterval, setChartInterval] = useState<ChartInterval>('15m');
+  const [isMobileTradingOpen, setIsMobileTradingOpen] = useState(false);
   
   if (children) {
     return (
@@ -36,10 +39,10 @@ export function MainContent({ children }: MainContentProps) {
         transition={{ duration: 0.3 }}
       >
         {selectedSymbol ? (
-          <div className='flex w-full flex-row h-screen'>
+          <div className='flex w-full flex-row h-screen relative'>
             {/* Left Panel - Chart Area (fills remaining space) */}
-            <div className="flex-1 p-4 pr-0 overflow-scroll">
-              <div className="mb-4 pr-4">
+            <div className="flex-1 p-4 lg:pr-0 overflow-scroll">
+              <div className="mb-4 lg:pr-4">
                 <AssetSelectorDropdown />
               </div>
               <TradingChart
@@ -52,14 +55,81 @@ export function MainContent({ children }: MainContentProps) {
               <BottomPanel />
             </div>
             
-            {/* Right Panel - Trading Controls (fixed width, no gap) */}
-            <div className="w-[400px] flex-shrink-0 bg-background border-l border-border/30 shadow-xl overflow-scroll">
+            {/* Desktop Right Panel - Trading Controls (hidden on mobile/tablet) */}
+            <div className="hidden lg:flex w-[400px] flex-shrink-0 bg-background border-l border-border/30 shadow-xl overflow-scroll">
               <div className="space-y-3 p-4">
                 <TradingPanel className="h-fit" />
                 <PositionsList className="h-fit" maxHeight="350px" />
               </div>
             </div>
 
+            {/* Floating Trade Button (visible on mobile/tablet) */}
+            <motion.div
+              className="lg:hidden fixed bottom-6 right-6 z-50"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Button
+                onClick={() => setIsMobileTradingOpen(true)}
+                className="w-14 h-14 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-2xl shadow-blue-500/25 border-0"
+                size="icon"
+              >
+                <TrendingUp className="h-6 w-6" />
+              </Button>
+            </motion.div>
+
+            {/* Mobile Trading Modal/Drawer */}
+            <AnimatePresence>
+              {isMobileTradingOpen && (
+                <>
+                  {/* Backdrop */}
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="lg:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+                    onClick={() => setIsMobileTradingOpen(false)}
+                  />
+                  
+                  {/* Trading Panel Drawer */}
+                  <motion.div
+                    initial={{ x: '100%' }}
+                    animate={{ x: 0 }}
+                    exit={{ x: '100%' }}
+                    transition={{ type: 'tween', duration: 0.3 }}
+                    className="lg:hidden fixed right-0 top-0 bottom-0 w-[85%] max-w-[400px] bg-background border-l border-border/30 shadow-2xl z-50 overflow-hidden"
+                  >
+                    {/* Header */}
+                    <div className="flex items-center justify-between p-4 border-b border-border/30 bg-background/80 backdrop-blur-sm">
+                      <div className="flex items-center gap-2">
+                        <div className="p-2 rounded-lg bg-gradient-to-r from-blue-500/10 to-purple-600/10">
+                          <BarChart3 className="h-5 w-5 text-blue-500" />
+                        </div>
+                        <span className="font-semibold">Trading Panel</span>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setIsMobileTradingOpen(false)}
+                        className="h-8 w-8 rounded-full"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    
+                    {/* Content */}
+                    <div className="overflow-y-auto h-full pb-20">
+                      <div className="space-y-4 p-4">
+                        <TradingPanel className="h-fit" />
+                        <PositionsList className="h-fit" maxHeight="300px" />
+                      </div>
+                    </div>
+                  </motion.div>
+                </>
+              )}
+            </AnimatePresence>
           </div>
         ) : (
           <div className="flex-1">

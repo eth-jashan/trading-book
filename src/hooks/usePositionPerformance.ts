@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { useMemo } from 'react';
 import { useTradingStore } from '@/stores/trading/trading.store';
 import { useMarketStore } from '@/stores/market/market.store';

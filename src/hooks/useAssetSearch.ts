@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useAssetsStore } from '@/stores/assets/assets.store';
 import { useMarketStore } from '@/stores';

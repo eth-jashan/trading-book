@@ -1,14 +1,12 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { ChevronDown, Search, Star, TrendingUp, TrendingDown, ArrowUp, ArrowDown, Activity } from 'lucide-react';
+import { ChevronDown, Search, Star, TrendingUp, ArrowUp, ArrowDown, Activity } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { formatNumber } from '@/lib/utils';
 import { useUIStore, useMarketStore, useFavorites } from '@/stores';
-import { PriceData } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
 interface AssetSelectorDropdownProps {
@@ -24,7 +22,7 @@ export function AssetSelectorDropdown({ className }: AssetSelectorDropdownProps)
   
   const { selectedSymbol, setSelectedSymbol } = useUIStore();
   const { prices, getPrice } = useMarketStore();
-  const { favorites, toggleFavorite, isFavorite } = useFavorites();
+  const { toggleFavorite, isFavorite } = useFavorites();
   
   const currentPrice = getPrice(selectedSymbol || 'BTC');
 

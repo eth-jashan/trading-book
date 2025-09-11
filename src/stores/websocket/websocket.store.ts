@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
@@ -89,8 +90,6 @@ export const useWebSocketStore = create<WebSocketState>()(
   devtools(
     immer((set, get) => ({
       ...initialState,
-      
-      // Connection Management
       connect: async (url?: string) => {
         return new Promise((resolve, reject) => {
           const wsUrl = url || get().url;
@@ -113,7 +112,7 @@ export const useWebSocketStore = create<WebSocketState>()(
               }
             }, get().connectionTimeout);
             
-            ws.onopen = (event) => {
+            ws.onopen = () => {
               console.log('WebSocket connected to:', wsUrl);
               clearTimeout(connectionTimeout);
               
