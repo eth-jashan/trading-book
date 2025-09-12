@@ -8,6 +8,7 @@ import { TradingChart } from '@/components/chart/TradingChart';
 import { TradingPanel } from '@/components/trading/TradingPanel';
 import { PositionsList } from '@/components/trading/PositionsList';
 import { OrdersList } from '@/components/trading/OrdersList';
+import { SettlementPanel } from '@/components/trading/SettlementPanel';
 import { ChartInterval } from '@/types/chart.types';
 import { AssetSelectorDropdown } from '../trading/AssetSelectorDropdown';
 import { BottomPanel } from './BottomPanel';
@@ -59,9 +60,10 @@ export function MainContent({ children }: MainContentProps) {
             {/* Desktop Right Panel - Trading Controls (hidden on mobile/tablet) */}
             <div className="hidden lg:flex w-[400px] flex-shrink-0 bg-background border-l border-border/30 shadow-xl overflow-scroll">
               <div className="space-y-3 p-4">
+                <SettlementPanel className="h-fit" />
                 <TradingPanel className="h-fit" />
-                <OrdersList className="h-fit" maxHeight="250px" />
-                <PositionsList className="h-fit" maxHeight="300px" />
+                <OrdersList className="h-fit" maxHeight="200px" />
+                <PositionsList className="h-fit" maxHeight="250px" />
               </div>
             </div>
 
@@ -124,9 +126,11 @@ export function MainContent({ children }: MainContentProps) {
                     {/* Content */}
                     <div className="overflow-y-auto h-full pb-20">
                       <div className="space-y-4 p-4">
+                        <SettlementPanel className="h-fit" />
                         <TradingPanel className="h-fit" />
-                        <OrdersList className="h-fit" maxHeight="200px" />
-                        <PositionsList className="h-fit" maxHeight="250px" />
+                        <OrdersList className="h-fit" maxHeight="150px" />
+                        <PositionsList className="h-fit" maxHeight="200px" />
+                        
                       </div>
                     </div>
                   </motion.div>

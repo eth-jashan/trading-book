@@ -2,7 +2,13 @@
 
 A sophisticated, full-featured paper trading platform built with Next.js, featuring real-time market data, advanced charting, comprehensive portfolio management, and intelligent risk management systems.
 
-![Trading Book Demo](https://via.placeholder.com/800x400/1a1a1a/ffffff?text=Trading+Book+Dashboard)
+## 🎥 Demo Videos
+
+### Desktop View
+https://github.com/user-attachments/assets/desktop-demo-view.mp4
+
+### Responsive Mobile View  
+https://github.com/user-attachments/assets/responsive-demo-view.mp4
 
 ## 🌟 Key Features
 
@@ -15,7 +21,9 @@ A sophisticated, full-featured paper trading platform built with Next.js, featur
 
 ### 🎯 **Sophisticated Trading Engine**
 - **Order Types**: Market, Limit, Stop, Stop-Limit orders with real-time execution
+- **Order Management**: View and cancel pending limit orders until execution
 - **Position Management**: Long/Short positions with dynamic P&L tracking
+- **Settlement System**: Withdraw balance and settle P&L with complete transaction history
 - **Risk Management**: Advanced risk metrics, position sizing, liquidation warnings
 - **Auto-Execution**: Stop-loss and take-profit automatic triggering
 - **Transaction History**: Complete audit trail of all trading activities
@@ -135,6 +143,8 @@ trading-book/
 │   │   ├── 📁 trading/            # Trading Components
 │   │   │   ├── TradingPanel.tsx   # Order entry interface
 │   │   │   ├── PositionsList.tsx  # Open/closed positions
+│   │   │   ├── OrdersList.tsx     # Pending/filled orders display
+│   │   │   ├── SettlementPanel.tsx # Balance withdrawal & settlement
 │   │   │   ├── AssetSelector*.tsx # Asset selection components
 │   │   │   └── Order*.tsx         # Order-related components
 │   │   └── 📁 ui/                 # UI Components (Radix UI)
@@ -216,19 +226,28 @@ npm run format     # Format code with Biome
 
 ### **2. Comprehensive Trading Panel**
 - **Order Types**: Full suite of order types with validation
+- **Order Management**: Real-time view of pending orders with cancel functionality
 - **Position Sizing**: Intelligent size calculations with risk management
 - **Real-time Validation**: Live order validation with helpful error messages
 - **Quick Actions**: One-click position closing and modification
 - **Mobile Optimization**: Responsive design with floating modal interface
 
-### **3. Multi-Tab Analytics Dashboard**
-- **Performance Overview**: Portfolio summary with key metrics
+### **3. Settlement & Withdrawal System**
+- **Balance Overview**: Real-time display of total P&L and performance metrics
+- **Withdrawal Interface**: Easy withdrawal of available balance with validation
+- **Settlement History**: Complete transaction history including withdrawals
+- **P&L Breakdown**: Clear separation of realized vs unrealized profits/losses
+- **Return Calculation**: Percentage return based on initial trading balance
+
+### **4. Multi-Tab Analytics Dashboard**
+- **Orders Tab**: View pending limit orders and recent filled orders
+- **Performance Overview**: Portfolio summary with key metrics  
 - **Transaction History**: Complete trading history with search and filters
 - **Position Analytics**: Detailed position performance analysis
 - **Activity Heatmaps**: Visual representation of trading activity
 - **Risk Analysis**: Comprehensive risk metrics and warnings
 
-### **4. Real-time Chart Integration**
+### **5. Real-time Chart Integration**
 - **TradingView Integration**: Professional-grade charting experience
 - **Live Updates**: Real-time price updates with WebSocket feeds
 - **Multiple Timeframes**: Comprehensive timeframe selection
@@ -371,6 +390,8 @@ npm run audit:performance
 ### **Phase 1: Core Features** ✅
 - [x] Real-time market data integration
 - [x] Advanced trading simulation engine
+- [x] Order management system (pending/filled orders display)
+- [x] Settlement and withdrawal functionality
 - [x] Comprehensive risk management
 - [x] Responsive design implementation
 - [x] Performance analytics dashboard

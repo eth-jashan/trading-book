@@ -45,6 +45,7 @@ interface TradingState {
   // Actions - Balance
   updateBalance: (updates: Partial<Balance>) => void;
   addTransaction: (transaction: Omit<Transaction, 'id' | 'timestamp'>) => void;
+  withdrawBalance: (amount: number) => { success: boolean; error?: string };
   
   // Private methods
   _processMarketOrder: (order: Order) => void;
@@ -584,6 +585,41 @@ export const useTradingStore = create<TradingState>()(
             timestamp: Date.now(),
           });
         });
+      },
+
+      withdrawBalance: (amount: number) => {
+        const state = get();
+        
+        // Validation
+        if (amount <= 0) {
+          return { success: false, error: 'Withdrawal amount must be greater than 0' };
+        }
+        
+        if (amount > state.balance.available) {
+          return { success: false, error: `Insufficient balance. Available: ${formatNumber(state.balance.available, { currency: true })}` };
+        }
+        
+        // Process withdrawal
+        set((state) => {
+          // Update balance
+          state.balance.available -= amount;
+          state.balance.total -= amount;
+          
+          // Recalculate dependent values
+          state.balance.freeMargin = state.balance.available + state.balance.unrealizedPnl;
+          
+          // Add withdrawal transaction
+          state.transactions.push({
+            id: generateId('tx'),
+            type: 'withdrawal',
+            amount: -amount, // Negative because it's money going out
+            balance: state.balance.available,
+            timestamp: Date.now(),
+            description: `Withdrawal of ${formatNumber(amount, { currency: true })}`,
+          });
+        });
+        
+        return { success: true };
       },
       
       // Risk Management

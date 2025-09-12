@@ -480,6 +480,7 @@ export const initializeBatchedUpdates = (config?: {
 /**
  * Clean up batched updates system
  */
+
 export const cleanupBatchedUpdates = () => {
   if (batchedUpdater) {
     batchedUpdater.destroy();
