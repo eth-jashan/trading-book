@@ -31,16 +31,27 @@ import { Card } from '@/components/ui/card';
 import { formatNumber, formatTimestamp, cn } from '@/lib/utils';
 import { PositionPerformanceDashboard } from '@/components/analytics/PositionPerformanceDashboard';
 import { PositionHeatMap } from '@/components/analytics/PositionHeatMap';
+import { OrdersList } from '@/components/trading/OrdersList';
 
-type BottomPanelTab = 'history' | 'portfolio' | 'analytics' | 'performance' | 'heatmap';
+type BottomPanelTab = 'orders' | 'history' | 'portfolio' | 'analytics' | 'performance' | 'heatmap';
 
 export function BottomPanel() {
-  const [activeTab, setActiveTab] = useState<BottomPanelTab>('analytics');
-  const { transactions, positions, orders } = useTradingStore();
+  const [activeTab, setActiveTab] = useState<BottomPanelTab>('orders');
+  const { transactions, positions, orders, getPendingOrders } = useTradingStore();
   const { metrics } = usePortfolioMetrics();
+  const pendingOrders = getPendingOrders();
 
   // Tab configuration with enhanced metadata
   const tabs = [
+    {
+      id: 'orders' as const,
+      label: 'Orders',
+      shortLabel: 'Orders',
+      icon: <ClockIcon className="h-4 w-4" />,
+      description: 'Your pending and recent orders',
+      color: 'blue',
+      count: pendingOrders.length
+    },
     {
       id: 'history' as const,
       label: 'History',
@@ -136,6 +147,7 @@ export function BottomPanel() {
           transition={{ duration: 0.2 }}
           className=""
         >
+          {activeTab === 'orders' && <OrdersPanel />}
           {activeTab === 'history' && <HistoryPanel transactions={transactions} />}
           {activeTab === 'portfolio' && <PortfolioPanel positions={positions} />}
           {activeTab === 'analytics' && <AnalyticsPanel metrics={metrics} />}
@@ -1030,5 +1042,14 @@ function MetricCard({
         <div className="text-xs text-muted-foreground">{subtitle}</div>
       </div>
     </Card>
+  );
+}
+
+// Orders Panel Component
+function OrdersPanel() {
+  return (
+    <div className="h-full overflow-hidden">
+      <OrdersList className="h-full" maxHeight="100%" />
+    </div>
   );
 }

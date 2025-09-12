@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { TradingChart } from '@/components/chart/TradingChart';
 import { TradingPanel } from '@/components/trading/TradingPanel';
 import { PositionsList } from '@/components/trading/PositionsList';
+import { OrdersList } from '@/components/trading/OrdersList';
 import { ChartInterval } from '@/types/chart.types';
 import { AssetSelectorDropdown } from '../trading/AssetSelectorDropdown';
 import { BottomPanel } from './BottomPanel';
@@ -59,7 +60,8 @@ export function MainContent({ children }: MainContentProps) {
             <div className="hidden lg:flex w-[400px] flex-shrink-0 bg-background border-l border-border/30 shadow-xl overflow-scroll">
               <div className="space-y-3 p-4">
                 <TradingPanel className="h-fit" />
-                <PositionsList className="h-fit" maxHeight="350px" />
+                <OrdersList className="h-fit" maxHeight="250px" />
+                <PositionsList className="h-fit" maxHeight="300px" />
               </div>
             </div>
 
@@ -123,7 +125,8 @@ export function MainContent({ children }: MainContentProps) {
                     <div className="overflow-y-auto h-full pb-20">
                       <div className="space-y-4 p-4">
                         <TradingPanel className="h-fit" />
-                        <PositionsList className="h-fit" maxHeight="300px" />
+                        <OrdersList className="h-fit" maxHeight="200px" />
+                        <PositionsList className="h-fit" maxHeight="250px" />
                       </div>
                     </div>
                   </motion.div>
