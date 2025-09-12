@@ -422,7 +422,7 @@ export class HyperliquidAPIService {
    * Make HTTP request to Hyperliquid API with retry logic
    */
   private async makeRequest(payload: any): Promise<any> {
-    let lastError: Error;
+    let lastError: Error = new Error('Request failed after multiple retries');
     
     for (let attempt = 0; attempt < this.retryAttempts; attempt++) {
       try {
