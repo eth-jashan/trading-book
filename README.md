@@ -5,10 +5,16 @@ A sophisticated, full-featured paper trading platform built with Next.js, featur
 ## 🎥 Demo Videos
 
 ### Desktop View
-https://github.com/user-attachments/assets/desktop-demo-view.mp4
+<video width="800" controls>
+  <source src="./desktop-demo-view.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
 ### Responsive Mobile View  
-https://github.com/user-attachments/assets/responsive-demo-view.mp4
+<video width="800" controls>
+  <source src="./responsive-demo-view.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
 ## 🌟 Key Features
 
@@ -20,12 +26,10 @@ https://github.com/user-attachments/assets/responsive-demo-view.mp4
 - **Cross-Platform Sync**: Seamless data synchronization across devices
 
 ### 🎯 **Sophisticated Trading Engine**
-- **Order Types**: Market, Limit, Stop, Stop-Limit orders with real-time execution
+- **Order Types**: Market, Limit, with real-time execution
 - **Order Management**: View and cancel pending limit orders until execution
 - **Position Management**: Long/Short positions with dynamic P&L tracking
 - **Settlement System**: Withdraw balance and settle P&L with complete transaction history
-- **Risk Management**: Advanced risk metrics, position sizing, liquidation warnings
-- **Auto-Execution**: Stop-loss and take-profit automatic triggering
 - **Transaction History**: Complete audit trail of all trading activities
 
 ### 💼 **Portfolio & Analytics**
