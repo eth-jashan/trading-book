@@ -5,16 +5,10 @@ A sophisticated, full-featured paper trading platform built with Next.js, featur
 ## 🎥 Demo Videos
 
 ### Desktop View
-<video width="800" controls>
-  <source src="https://d1v2n7tvgmp6ao.cloudfront.net/user/public/seshlabs.tech_1ba3100b-d44b-4269-971e-25b0a2e415ae/video/desktop-2025-09-12T151707.681472.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+[📺 Watch Desktop Demo](https://d1v2n7tvgmp6ao.cloudfront.net/user/public/seshlabs.tech_1ba3100b-d44b-4269-971e-25b0a2e415ae/video/desktop-2025-09-12T151707.681472.mp4){:target="_blank"}
 
 ### Responsive Mobile View  
-<video width="800" controls>
-  <source src="https://d1v2n7tvgmp6ao.cloudfront.net/user/public/seshlabs.tech_1ba3100b-d44b-4269-971e-25b0a2e415ae/video/responsive-2025-09-12T151236.511876.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+[📱 Watch Mobile Demo](https://d1v2n7tvgmp6ao.cloudfront.net/user/public/seshlabs.tech_1ba3100b-d44b-4269-971e-25b0a2e415ae/video/responsive-2025-09-12T151236.511876.mp4){:target="_blank"}
 
 ## 🌟 Key Features
 
@@ -38,13 +32,6 @@ A sophisticated, full-featured paper trading platform built with Next.js, featur
 - **Position Heatmaps**: Visual representation of portfolio performance
 - **Comprehensive Dashboards**: Multiple view modes for different analysis needs
 - **Historical Performance**: Long-term performance tracking and reporting
-
-### 🛡️ **Risk Management System**
-- **Dynamic Risk Assessment**: Real-time risk evaluation and warnings
-- **Position Sizing**: Intelligent position sizing based on risk tolerance
-- **Margin Management**: Automatic margin calculations and monitoring
-- **Liquidation Protection**: Early warning system for liquidation risks
-- **Risk Limits**: Customizable risk parameters and safety controls
 
 ### 📱 **Responsive Design**
 - **Mobile-First**: Optimized for mobile and tablet devices
