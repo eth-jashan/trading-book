@@ -6,13 +6,13 @@ A sophisticated, full-featured paper trading platform built with Next.js, featur
 
 ### Desktop View
 <video width="800" controls>
-  <source src="./desktop-demo-view.mp4" type="video/mp4">
+  <source src="https://d1v2n7tvgmp6ao.cloudfront.net/user/public/seshlabs.tech_1ba3100b-d44b-4269-971e-25b0a2e415ae/video/desktop-2025-09-12T151707.681472.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
 ### Responsive Mobile View  
 <video width="800" controls>
-  <source src="./responsive-demo-view.mp4" type="video/mp4">
+  <source src="https://d1v2n7tvgmp6ao.cloudfront.net/user/public/seshlabs.tech_1ba3100b-d44b-4269-971e-25b0a2e415ae/video/responsive-2025-09-12T151236.511876.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
