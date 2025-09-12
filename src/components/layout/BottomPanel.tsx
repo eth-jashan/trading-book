@@ -878,7 +878,7 @@ function AnalyticsPanel({ metrics }: { metrics: any }) {
       </div>
 
       {/* Risk Metrics */}
-      <div>
+      {/* <div>
         <div className="flex items-center gap-2 mb-4">
           <ShieldIcon className="h-4 w-4 text-muted-foreground" />
           <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Risk Analysis</h3>
@@ -908,7 +908,7 @@ function AnalyticsPanel({ metrics }: { metrics: any }) {
             icon={<MinusIcon className="h-4 w-4" />}
           />
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }
