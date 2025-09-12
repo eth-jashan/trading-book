@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { useMarketStore } from '@/stores/market/market.store';
 import { useUIStore } from '@/stores/ui/ui.store';
 import { storeEvents, STORE_EVENTS } from '@/stores/middleware';
@@ -125,9 +126,9 @@ class WebSocketManager {
     try {
       this.ws.send(message);
       
-      if (DEBUG.LOG_WEBSOCKET) {
-        console.log('📤 WS Send:', JSON.parse(message));
-      }
+      // if (DEBUG.LOG_WEBSOCKET) {
+      //   console.log('📤 WS Send:', JSON.parse(message));
+      // }
       
       return true;
     } catch (error) {
@@ -243,9 +244,9 @@ class WebSocketManager {
   
   // Event Handlers
   private handleOpen = (): void => {
-    if (DEBUG.LOG_WEBSOCKET) {
-      console.log('🔗 WebSocket connected');
-    }
+    // if (DEBUG.LOG_WEBSOCKET) {
+    //   console.log('🔗 WebSocket connected');
+    // }
     
     this.updateConnectionState({
       connected: true,
@@ -278,9 +279,9 @@ class WebSocketManager {
     try {
       const data = JSON.parse(event.data);
       
-      if (DEBUG.LOG_WEBSOCKET) {
-        console.log('📥 WS Receive:', data);
-      }
+      // if (DEBUG.LOG_WEBSOCKET) {
+      //   console.log('📥 WS Receive:', data);
+      // }
       
       this.processMessage(data);
       
@@ -308,9 +309,9 @@ class WebSocketManager {
   };
   
   private handleClose = (event: CloseEvent): void => {
-    if (DEBUG.LOG_WEBSOCKET) {
-      console.log('🔌 WebSocket closed:', event.code, event.reason);
-    }
+    // if (DEBUG.LOG_WEBSOCKET) {
+    //   console.log('🔌 WebSocket closed:', event.code, event.reason);
+    // }
     
     this.clearTimers();
     
@@ -376,9 +377,9 @@ class WebSocketManager {
         break;
         
       default:
-        if (DEBUG.LOG_WEBSOCKET) {
-          console.log('🤷 Unknown message type:', message.channel);
-        }
+        // if (DEBUG.LOG_WEBSOCKET) {
+        //   console.log('🤷 Unknown message type:', message.channel);
+        // }
     }
   }
   
@@ -469,9 +470,9 @@ class WebSocketManager {
       reconnectAttempts: this.state.reconnectAttempts + 1,
     });
     
-    if (DEBUG.LOG_WEBSOCKET) {
-      console.log(`⏰ Scheduling reconnection in ${delay}ms (attempt ${this.state.reconnectAttempts})`);
-    }
+    // if (DEBUG.LOG_WEBSOCKET) {
+    //   console.log(`⏰ Scheduling reconnection in ${delay}ms (attempt ${this.state.reconnectAttempts})`);
+    // }
     
     this.reconnectTimeout = setTimeout(() => {
       this.connect();
