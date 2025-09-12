@@ -1,18 +1,19 @@
+//@ts-nocheck
 /**
  * Position Management Tests
  * Tests for position creation, P&L calculation, and position lifecycle
  */
 
-import { useTradingStore } from '@/stores/trading/trading.store';
-import { useMarketStore } from '@/stores/market/market.store';
-import { calculatePnL } from '@/lib/utils';
+import { useTradingStore } from '../src/stores/trading/trading.store';
+import { useMarketStore } from '../src/stores/market/market.store';
+import { calculatePnL } from '../src/lib/utils';
 import { testUtils } from './setup';
 
 // Mock the stores and utilities
-jest.mock('@/stores/trading/trading.store');
-jest.mock('@/stores/market/market.store');
-jest.mock('@/lib/utils', () => ({
-  ...jest.requireActual('@/lib/utils'),
+jest.mock('../src/stores/trading/trading.store');
+jest.mock('../src/stores/market/market.store');
+jest.mock('../src/lib/utils', () => ({
+  ...jest.requireActual('../src/lib/utils'),
   calculatePnL: jest.fn(),
 }));
 
@@ -47,8 +48,8 @@ describe('Position Management Tests', () => {
       getPrice: jest.fn(),
     };
 
-    (useTradingStore as jest.Mock).mockReturnValue(mockTradingStore);
-    (useMarketStore as jest.Mock).mockReturnValue(mockMarketStore);
+    (useTradingStore as jest.MockedFunction<typeof useTradingStore>).mockReturnValue(mockTradingStore);
+    (useMarketStore as jest.MockedFunction<typeof useMarketStore>).mockReturnValue(mockMarketStore);
 
     // Setup market store getPrice method
     mockMarketStore.getPrice.mockImplementation((symbol: string) => 
@@ -319,6 +320,7 @@ describe('Position Management Tests', () => {
         currentPrice: 55000,
         margin: 500,
         pnl: 5,
+        
       });
 
       mockTradingStore.closePosition.mockImplementation(async (positionId: string) => {

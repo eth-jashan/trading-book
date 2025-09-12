@@ -32,6 +32,8 @@ const customJestConfig = {
   moduleNameMapping: {
     // Handle module aliases (same as tsconfig.json paths)
     '^@/(.*)$': '<rootDir>/src/$1',
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+    '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$': '<rootDir>/__mocks__/fileMock.js',
   },
   transform: {
     // Use babel-jest to transpile tests with the next/babel preset
@@ -41,12 +43,6 @@ const customJestConfig = {
     '/node_modules/',
     '^.+\\.module\\.(css|sass|scss)$',
   ],
-  // Mock CSS modules and static assets
-  moduleNameMapping: {
-    '^@/(.*)$': '<rootDir>/src/$1',
-    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
-    '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$': '<rootDir>/__mocks__/fileMock.js',
-  },
   globals: {
     'ts-jest': {
       tsconfig: {

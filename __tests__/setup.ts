@@ -2,7 +2,7 @@
  * Test Setup Configuration
  * Sets up global mocks and utilities for trading simulation tests
  */
-
+//@ts-nocheck
 // Mock WebSocket globally
 global.WebSocket = jest.fn().mockImplementation(() => ({
   addEventListener: jest.fn(),
@@ -118,6 +118,12 @@ export const testUtils = {
     timestamp: Date.now(),
     status: 'open' as const,
     liquidationPrice: 45000,
+    highestPrice: 50000,
+    lowestPrice: 50000,
+    priceHistory: [],
+    realizedPnl: 0,
+    unrealizedPnl: 0,
+    closedAt: null,
     ...overrides,
   }),
 

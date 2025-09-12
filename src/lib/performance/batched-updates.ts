@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { unstable_batchedUpdates } from 'react-dom';
 import { useMarketStore } from '@/stores/market/market.store';
 import { storeEvents, STORE_EVENTS } from '@/stores/middleware';

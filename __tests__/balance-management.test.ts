@@ -3,12 +3,12 @@
  * Tests for balance tracking, margin calculations, and balance consistency
  */
 
-import { useTradingStore } from '@/stores/trading/trading.store';
-import { TRADING_CONFIG } from '@/lib/constants';
+import { useTradingStore } from '../src/stores/trading/trading.store';
+import { TRADING_CONFIG } from '../src/lib/constants';
 import { testUtils } from './setup';
 
 // Mock the trading store
-jest.mock('@/stores/trading/trading.store');
+jest.mock('../src/stores/trading/trading.store');
 
 describe('Balance Management Tests', () => {
   let mockTradingStore: any;
@@ -31,7 +31,7 @@ describe('Balance Management Tests', () => {
       refreshBalances: jest.fn(),
     };
 
-    (useTradingStore as jest.Mock).mockReturnValue(mockTradingStore);
+    (useTradingStore as unknown as jest.Mock).mockReturnValue(mockTradingStore);
   });
 
   describe('Initial Balance Tests', () => {
