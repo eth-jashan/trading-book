@@ -5,10 +5,10 @@ A sophisticated, full-featured paper trading platform built with Next.js, featur
 ## 🎥 Demo Videos
 
 ### Desktop View
-[📺 Watch Desktop Demo](https://d1v2n7tvgmp6ao.cloudfront.net/user/public/seshlabs.tech_1ba3100b-d44b-4269-971e-25b0a2e415ae/video/desktop-2025-09-12T151707.681472.mp4){:target="_blank"}
+[📺 Watch Desktop Demo](https://d1v2n7tvgmp6ao.cloudfront.net/user/public/seshlabs.tech_1ba3100b-d44b-4269-971e-25b0a2e415ae/video/desktop-2025-09-12T151707.681472.mp4)
 
 ### Responsive Mobile View  
-[📱 Watch Mobile Demo](https://d1v2n7tvgmp6ao.cloudfront.net/user/public/seshlabs.tech_1ba3100b-d44b-4269-971e-25b0a2e415ae/video/responsive-2025-09-12T151236.511876.mp4){:target="_blank"}
+[📱 Watch Mobile Demo](https://d1v2n7tvgmp6ao.cloudfront.net/user/public/seshlabs.tech_1ba3100b-d44b-4269-971e-25b0a2e415ae/video/responsive-2025-09-12T151236.511876.mp4)
 
 ## 🌟 Key Features
 
