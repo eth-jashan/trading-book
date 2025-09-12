@@ -10,6 +10,9 @@ A sophisticated, full-featured paper trading platform built with Next.js, featur
 ### Responsive Mobile View  
 <a href="https://d1v2n7tvgmp6ao.cloudfront.net/user/public/seshlabs.tech_1ba3100b-d44b-4269-971e-25b0a2e415ae/video/responsive-2025-09-12T151236.511876.mp4" target="_blank">📱 Watch Mobile Demo</a>
 
+## Demo link
+<a href="https://trading-book-three.vercel.app/" target="_blank">Click Here</a>
+
 ## 🌟 Key Features
 
 ### 📈 **Real-Time Market Data & Charts**

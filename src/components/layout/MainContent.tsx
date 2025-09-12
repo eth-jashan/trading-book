@@ -60,8 +60,8 @@ export function MainContent({ children }: MainContentProps) {
             {/* Desktop Right Panel - Trading Controls (hidden on mobile/tablet) */}
             <div className="hidden lg:flex w-[400px] flex-shrink-0 bg-background border-l border-border/30 shadow-xl overflow-scroll">
               <div className="space-y-3 p-4">
-                <SettlementPanel className="h-fit" />
                 <TradingPanel className="h-fit" />
+                <SettlementPanel className="h-fit" />
                 <OrdersList className="h-fit" maxHeight="200px" />
                 <PositionsList className="h-fit" maxHeight="250px" />
               </div>
@@ -126,8 +126,8 @@ export function MainContent({ children }: MainContentProps) {
                     {/* Content */}
                     <div className="overflow-y-auto h-full pb-20">
                       <div className="space-y-4 p-4">
-                        <SettlementPanel className="h-fit" />
                         <TradingPanel className="h-fit" />
+                        <SettlementPanel className="h-fit" />
                         <OrdersList className="h-fit" maxHeight="150px" />
                         <PositionsList className="h-fit" maxHeight="200px" />
                         
