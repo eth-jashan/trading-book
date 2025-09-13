@@ -64,27 +64,36 @@ export function TradingChart({
   const { subscribeToCandles, subscribeToAllMids, unsubscribe, connected } = useWebSocket();
   const marketStore = useMarketStore();
   
-  // Handle responsive behavior
+  // Handle responsive behavior with debounce to prevent flicker
   useEffect(() => {
+    let resizeTimer: NodeJS.Timeout;
+    
     const handleResize = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
       
-      if (height === 'responsive') {
-        const newHeight = mobile ? 300 : window.innerHeight < 800 ? 400 : 500;
-        setChartHeight(newHeight);
-      } else if (typeof height === 'number') {
-        setChartHeight(height);
-      }
+      // Debounce height changes to prevent chart flicker
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        if (height === 'responsive') {
+          const newHeight = mobile ? 300 : window.innerHeight < 800 ? 400 : 500;
+          setChartHeight(newHeight);
+        } else if (typeof height === 'number') {
+          setChartHeight(height);
+        }
+      }, 100); // 100ms debounce
     };
 
     handleResize();
     window.addEventListener('resize', handleResize);
     
-    return () => window.removeEventListener('resize', handleResize);
+    return () => {
+      clearTimeout(resizeTimer);
+      window.removeEventListener('resize', handleResize);
+    };
   }, [height]);
 
-  // Initialize chart
+  // Initialize chart - only recreate when symbol changes, not on height changes
   useEffect(() => {
     if (!chartContainerRef.current) return;
 
@@ -174,7 +183,21 @@ export function TradingChart({
       window.removeEventListener('resize', handleResize);
       chart.remove();
     };
-  }, [symbol, chartHeight]);
+  }, [symbol]); // Remove chartHeight dependency to prevent recreating chart on height changes
+
+  // Update chart height separately without recreating the chart
+  useEffect(() => {
+    if (chartRef.current && chartContainerRef.current) {
+      chartRef.current.applyOptions({
+        height: chartHeight,
+        width: chartContainerRef.current.clientWidth
+      });
+    }
+  }, [chartHeight]);
+
+  // Store candles data in ref to preserve it across re-renders
+  const candlesDataRef = useRef<any[]>([]);
+  const volumeDataRef = useRef<any[]>([]);
 
   // Load candle data
   useEffect(() => {
@@ -192,38 +215,36 @@ export function TradingChart({
           return;
         }
 
-        // Set candle data
-        candleSeriesRef.current.setData(candles.map(candle => ({
+        // Store data in refs
+        candlesDataRef.current = candles.map(candle => ({
           ...candle,
           time: candle.time as any // Cast to Time type
-        })));
+        }));
 
-        // Set volume data
-        const volumeData = candles.map(candle => ({
+        volumeDataRef.current = candles.map(candle => ({
           time: candle.time as any, // Cast to Time type
           value: candle.volume || 0,
           color: candle.close >= candle.open ? '#10B98180' : '#EF444480',
         }));
-        volumeSeriesRef.current.setData(volumeData);
+
+        // Set candle data
+        candleSeriesRef.current.setData(candlesDataRef.current);
+        // Set volume data
+        volumeSeriesRef.current.setData(volumeDataRef.current);
+        
         // Fit content
-            chartRef.current?.timeScale().fitContent();
-              // // Sort by time
-              const chartCandles = candles.sort((a: any, b: any) => a.time - b.time);
-      
-              // // Update chart series
-              // candleSeriesRef.current.setData(chartCandles);
-      
-              // Update volume data
-              
-              
-              console.log("setting the value.....................",chartCandles)
-              // Store last candle for real-time updates
-              if (chartCandles.length > 0) {
-                lastCandleRef.current = chartCandles[chartCandles.length - 1];
-              }
-              
-              setLastUpdateTime(Date.now());
-            
+        chartRef.current?.timeScale().fitContent();
+        
+        // Sort by time
+        const chartCandles = candles.sort((a: any, b: any) => a.time - b.time);
+        
+        console.log("setting the value.....................",chartCandles)
+        // Store last candle for real-time updates
+        if (chartCandles.length > 0) {
+          lastCandleRef.current = chartCandles[chartCandles.length - 1];
+        }
+        
+        setLastUpdateTime(Date.now());
 
       } catch (err) {
         console.error('Failed to load chart data:', err);
@@ -235,6 +256,16 @@ export function TradingChart({
 
     loadData();
   }, [symbol, currentInterval]);
+
+  // Restore data after chart recreation (if needed)
+  useEffect(() => {
+    if (candleSeriesRef.current && candlesDataRef.current.length > 0) {
+      candleSeriesRef.current.setData(candlesDataRef.current);
+    }
+    if (volumeSeriesRef.current && volumeDataRef.current.length > 0) {
+      volumeSeriesRef.current.setData(volumeDataRef.current);
+    }
+  }, [candleSeriesRef.current, volumeSeriesRef.current]);
 
   // Subscribe to WebSocket candle updates
   useEffect(() => {
@@ -569,11 +600,12 @@ export function TradingChart({
         </AnimatePresence>
       )}
 
-      {/* Chart Container */}
+      {/* Chart Container - using key to prevent re-mount on drawer open */}
       <div 
         ref={chartContainerRef} 
         className="w-full touch-pan-x touch-pan-y"
         style={{ height: chartHeight }}
+        key={`chart-${symbol}`} // Stable key to prevent unnecessary re-mounts
       />
 
       {/* Loading Overlay */}
